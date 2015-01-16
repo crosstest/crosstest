@@ -74,14 +74,6 @@ module Crosstest
                   aliases: '-t',
                   desc: 'The Crosstest test directory',
                   default: 'tests/crosstest'
-    method_option :solo,
-                  desc: 'Enable solo mode - Crosstest will auto-configure a single project and its scenarios'
-    # , default: 'crosstest.yaml'
-    method_option :solo_glob,
-                  desc: 'The globbing pattern to find code samples in solo mode'
-    method_option :source,
-                  type: :boolean,
-                  desc: 'Include source file in listing'
     filter_options
     def list(*args)
       update_config!
@@ -104,11 +96,6 @@ module Crosstest
                   aliases: '-t',
                   desc: 'The Crosstest test directory',
                   default: 'tests/crosstest'
-    method_option :solo,
-                  desc: 'Enable solo mode - Crosstest will auto-configure a single project and its scenarios'
-    # , default: 'crosstest.yaml'
-    method_option :solo_glob,
-                  desc: 'The globbing pattern to find code samples in solo mode'
     filter_options
     def show(*args)
       update_config!
@@ -157,10 +144,6 @@ module Crosstest
                     aliases: '-t',
                     desc: 'The Crosstest test directory',
                     default: 'tests/crosstest'
-      method_option :solo,
-                    desc: 'Enable solo mode - Crosstest will auto-configure a single project and its scenarios'
-      method_option :solo_glob,
-                    desc: 'The globbing pattern to find code samples in solo mode'
       define_method(action) do |*args|
         update_config!
         action_options = options.dup
@@ -194,11 +177,6 @@ module Crosstest
                   aliases: '-t',
                   desc: 'The Crosstest test directory',
                   default: 'tests/crosstest'
-    method_option :solo,
-                  desc: 'Enable solo mode - Crosstest will auto-configure a single project and its scenarios'
-    # , default: 'crosstest.yaml'
-    method_option :solo_glob,
-                  desc: 'The globbing pattern to find code samples in solo mode'
     def test(*args)
       update_config!
       action_options = options.dup

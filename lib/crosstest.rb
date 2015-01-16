@@ -69,10 +69,8 @@ module Crosstest
         logger.debug "Loading manifest file: #{manifest_file}"
         @basedir = File.dirname manifest_file
         Crosstest.configuration.manifest = manifest_file
-      elsif options[:solo]
-        solo_setup(options)
       else
-        fail StandardError, "No manifest found at #{manifest_file} and not using --solo mode"
+        fail StandardError, "No manifest found at #{manifest_file}"
       end
 
       manifest.build_scenarios
@@ -80,28 +78,6 @@ module Crosstest
       test_dir = options[:test_dir] || File.expand_path('tests/crosstest/', Dir.pwd)
       autoload_crosstest_files(test_dir) unless test_dir.nil? || !File.directory?(test_dir)
       manifest
-    end
-
-    def solo_setup(options)
-      suites = {}
-      solo_basedir = options[:solo]
-      solo_glob = options.fetch('solo_glob', "**/*.{#{SUPPORTED_EXTENSIONS.join(',')}}")
-      Dir[File.join(solo_basedir, solo_glob)].sort.each do | code_sample |
-        code_sample = Pathname.new(code_sample)
-        suite_name = relativize(code_sample.dirname, solo_basedir).to_s
-        suite_name = solo_basedir if suite_name == '.'
-        scenario_name = code_sample.basename(code_sample.extname).to_s
-        suite = suites[suite_name] ||= Crosstest::Manifest::Suite.new(samples: [])
-        suite.samples << scenario_name
-      end
-      @manifest = Crosstest.configuration.manifest = Crosstest::Manifest.new(
-        projects: {
-          File.basename(solo_basedir) => {
-            basedir: solo_basedir
-          }
-        },
-        suites: suites
-      )
     end
 
     def select_scenarios(regexp)

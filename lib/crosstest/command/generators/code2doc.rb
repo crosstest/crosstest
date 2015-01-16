@@ -17,11 +17,6 @@ module Crosstest
                      aliases: '-m',
                      desc: 'The Crosstest test manifest file location',
                      default: 'crosstest.yaml'
-        class_option :solo,
-                     desc: 'Enable solo mode - Crosstest will auto-configure a single project and its scenarios'
-        # , default: 'crosstest.yaml'
-        class_option :solo_glob,
-                     desc: 'The globbing pattern to find code samples in solo mode'
         class_option :format,
                      aliases: '-f',
                      enum: %w(md rst),
