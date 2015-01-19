@@ -1,7 +1,7 @@
-require 'crosstest/documentation/comment_styles'
+require 'crosstest/code2doc/comment_styles'
 
 module Crosstest
-  module Documentation
+  module Code2Doc
     # This class was extracted from the [Rocco](http://rtomayko.github.com/rocco/) project
     # which was in turn based on the [Docco](http://jashkenas.github.com/docco/).
     class CodeSegmenter # rubocop:disable all

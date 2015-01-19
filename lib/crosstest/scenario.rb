@@ -1,5 +1,5 @@
 require 'benchmark'
-require 'crosstest/documentation/helpers/code_helper'
+require 'crosstest/code2doc/helpers/code_helper'
 
 # TODO: This class really needs to be split-up - and probably renamed.
 #
@@ -24,7 +24,7 @@ module Crosstest
     include Crosstest::Core::Logging
     include Crosstest::Core::Util::String
     # View helpers
-    include Crosstest::Documentation::Helpers::CodeHelper
+    include Crosstest::Code2Doc::Helpers::CodeHelper
 
     property :name
     property :project, required: true

@@ -8,7 +8,7 @@ module Crosstest
       Padrino::Helpers::OutputHelpers,
       Padrino::Helpers::AssetTagHelpers,
       Padrino::Helpers::TagHelpers,
-      Crosstest::Documentation::Helpers::CodeHelper
+      Crosstest::Code2Doc::Helpers::CodeHelper
     ].each do | helper|
       include helper
     end
@@ -40,7 +40,7 @@ module Crosstest
     def code2doc(source_file, language = nil)
       source_code = File.read(source_file)
       if language.nil?
-        language, comment_style = Documentation::CommentStyles.infer File.extname(source_file)
+        language, comment_style = Code2Doc::CommentStyles.infer File.extname(source_file)
         segmenter_language = comment_style[:language] || language
       else
         segmenter_language = language
@@ -50,7 +50,7 @@ module Crosstest
       segmenter_options = {
         language: segmenter_language
       }
-      segmenter = Crosstest::Documentation::CodeSegmenter.new(segmenter_options)
+      segmenter = Crosstest::Code2Doc::CodeSegmenter.new(segmenter_options)
       segments = segmenter.segment source_code
       segments.each do |comment, code|
         comment = comment.join("\n")

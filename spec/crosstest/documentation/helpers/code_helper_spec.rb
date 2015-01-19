@@ -1,5 +1,5 @@
 module Crosstest
-  module Documentation
+  module Code2Doc
     module Helpers
       describe CodeHelper do
         let(:scenario) { Fabricate(:scenario, name: 'test', source_file: @source_file) }

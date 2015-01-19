@@ -1,8 +1,8 @@
-require 'crosstest/documentation/code_segmenter'
+require 'crosstest/code2doc/code_segmenter'
 require 'rouge'
 
 module Crosstest
-  module Documentation
+  module Code2Doc
     module Helpers
       module CodeHelper
         class ReStructuredTextHelper
@@ -28,7 +28,7 @@ module Crosstest
           end
         end
         def initialize(*args)
-          @segmenter = Crosstest::Documentation::CodeSegmenter.new
+          @segmenter = Crosstest::Code2Doc::CodeSegmenter.new
           super
         end
 

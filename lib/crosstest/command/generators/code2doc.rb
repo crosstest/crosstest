@@ -56,7 +56,7 @@ module Crosstest
             begin
               doc = Crosstest::DocumentationGenerator.new.code2doc(scenario.absolute_source_file)
               create_file(target_file_name, doc)
-            rescue Crosstest::Documentation::CommentStyles::UnknownStyleError
+            rescue Crosstest::Code2Doc::CommentStyles::UnknownStyleError
               warn "Could not generated documentation for #{source_file}, because the language couldn't be detected."
             end
           end
