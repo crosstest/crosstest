@@ -1,7 +1,7 @@
 module Crosstest
   module Reporters
     class MarkdownReporter
-      include Crosstest::Util::String
+      include Crosstest::Core::Util::String
       def initialize(io = $stdout)
         @buffer = io
       end

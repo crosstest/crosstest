@@ -1,14 +1,12 @@
+require 'crosstest/version'
+require 'crosstest/core'
 require 'cause'
 require 'thor'
 require 'pathname'
-require 'psychic/runner'
-require 'crosstest/version'
-require 'crosstest/logger'
-require 'crosstest/logging'
+require 'crosstest/psychic'
+require 'crosstest/project_logger'
 require 'crosstest/error'
 require 'crosstest/dash'
-require 'crosstest/util'
-require 'crosstest/color'
 require 'crosstest/validation'
 require 'crosstest/result'
 require 'crosstest/evidence'
@@ -24,15 +22,13 @@ require 'crosstest/validator'
 require 'crosstest/validator_registry'
 
 module Crosstest
-  include Crosstest::DefaultLogger
-  include Crosstest::Logging
+  include Crosstest::Core::Logger
+  include Crosstest::Core::Logging
 
   # File extensions that Crosstest can automatically detect/execute
   SUPPORTED_EXTENSIONS = %w(py rb js)
 
   class << self
-    include Crosstest::Util::FileSystem
-
     DEFAULT_MANIFEST_FILE = 'crosstest.yaml'
 
     # @return [Mutex] a common mutex for global coordination
@@ -47,6 +43,18 @@ module Crosstest
 
     def logger
       @logger ||= Crosstest.default_file_logger
+    end
+
+    def new_logger(project) # (test, project, index)
+      name = project.name # instance_name(test, project)
+      index = Crosstest.projects.index(project) || 0
+      ProjectLogger.new(
+        stdout: STDOUT,
+        color: Core::Color::COLORS[index % Core::Color::COLORS.size].to_sym,
+        logdev: File.join(Crosstest.configuration.log_root, "#{name}.log"),
+        level: Crosstest::Core::Util.to_logger_level(Crosstest.configuration.log_level),
+        progname: name
+      )
     end
 
     def basedir
@@ -126,7 +134,7 @@ module Crosstest
     # @return [Logger] a logger
     def default_file_logger
       logfile = File.expand_path(File.join('.crosstest', 'logs', 'crosstest.log'))
-      Logger.new(stdout: $stdout, logdev: logfile, level: env_log)
+      ProjectLogger.new(stdout: $stdout, logdev: logfile, level: env_log)
     end
 
     # Determine the default log level from an environment variable, if it is
@@ -170,7 +178,7 @@ module Crosstest
 
     # @api private
     def global_runner
-      @global_runner ||= Psychic::Runner.new(cwd: Crosstest.basedir, logger: logger)
+      @global_runner ||= Crosstest::Psychic.new(cwd: Crosstest.basedir, logger: logger)
     end
 
     # @see Crosstest::Configuration
@@ -199,7 +207,7 @@ module Crosstest
       Dir["#{dir}/**/*.rb"].each do | file_to_require |
         # TODO: Need a better way to skip generators or only load validators
         next if file_to_require.match %r{generators/.*/files/}
-        require relativize(file_to_require, dir).to_s.gsub('.rb', '')
+        require Crosstest::Core::FileSystem.relativize(file_to_require, dir).to_s.gsub('.rb', '')
       end
     end
   end

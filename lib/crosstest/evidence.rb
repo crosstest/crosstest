@@ -42,7 +42,7 @@ module Crosstest
 
     def save
       dir = File.dirname(file_name)
-      serialized_string = serialize_hash(Util.stringified_hash(to_hash))
+      serialized_string = serialize_hash(Core::Util.stringified_hash(to_hash))
 
       FileUtils.mkdir_p(dir)
       File.open(file_name, 'wb') { |f| f.write(serialized_string) }

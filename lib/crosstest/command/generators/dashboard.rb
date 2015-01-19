@@ -6,9 +6,9 @@ module Crosstest
     class Generate
       class Dashboard < Thor::Group
         include Thor::Actions
-        include Crosstest::Util::FileSystem
+        include Crosstest::Core::FileSystem
         module Helpers
-          include Crosstest::Util::String
+          include Crosstest::Core::Util::String
           # include Padrino::Helpers::RenderHelpers # requires sinatra-compatible render method
           include Padrino::Helpers::TagHelpers
           include Padrino::Helpers::OutputHelpers

@@ -5,10 +5,10 @@ module Crosstest
   module Command
     class Generate
       class Code2Doc < Thor::Group
-        include Crosstest::DefaultLogger
-        include Crosstest::Logging
+        include Core::DefaultLogger
+        include Crosstest::Core::Logging
         include Thor::Actions
-        include Crosstest::Util::FileSystem
+        include Crosstest::Core::FileSystem
 
         class_option :log_level,
                      aliases: '-l',

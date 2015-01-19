@@ -20,7 +20,7 @@ module Crosstest
             run_action(action, tests)
           end
         end
-        banner "Crosstest is finished. #{Util.duration(elapsed.real)}"
+        banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end
     end
   end

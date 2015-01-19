@@ -19,8 +19,8 @@ module Crosstest
       end
     end
 
-    include Crosstest::Logging
-    include Crosstest::Util::FileSystem
+    include Crosstest::Core::Logging
+    include Crosstest::Core::FileSystem
     property :name
     property :basedir, required: true
     property :language
@@ -36,11 +36,11 @@ module Crosstest
     end
 
     def runner
-      @runner ||= Psychic::Runner.new(cwd: basedir, logger: logger)
+      @runner ||= Crosstest::Psychic.new(cwd: basedir, logger: logger)
     end
 
     def logger
-      @logger ||= Crosstest::Logger.new_logger(self)
+      @logger ||= Crosstest.new_logger(self)
     end
 
     def clone
@@ -67,14 +67,14 @@ module Crosstest
       end
       fail "Project #{task_name} has not been cloned" unless cloned?
       runner.execute_task(task_name)
-    rescue Psychic::Runner::TaskNotImplementedError => e
+    rescue Crosstest::Psychic::TaskNotImplementedError => e
       logger.error("Could not run task #{task_name} for #{name}: #{e.message}")
       raise ActionFailed.new("Failed to run task #{task_name} for #{name}: #{e.message}", e)
     end
 
     def bootstrap
       task('bootstrap', "Bootstrapping #{name}")
-    rescue Psychic::Runner::TaskNotImplementedError
+    rescue Crosstest::Psychic::TaskNotImplementedError
       logger.warn "Skipping bootstrapping for #{name}, no bootstrap task exists"
     end
 
@@ -83,8 +83,8 @@ module Crosstest
       scenario_data[:project] ||= self
       scenario_data[:suite] ||= ''
       begin
-        scenario_data[:source_file] ||= find_file basedir, scenario_data[:name]
-        scenario_data[:source_file] = relativize(scenario_data[:source_file], scenario_data[:basedir])
+        scenario_data[:source_file] ||= Core::FileSystem.find_file basedir, scenario_data[:name]
+        scenario_data[:source_file] = Core::FileSystem.relativize(scenario_data[:source_file], scenario_data[:basedir])
       rescue Errno::ENOENT
         scenario_data[:source_file] = nil
       end

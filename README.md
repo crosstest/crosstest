@@ -106,7 +106,7 @@ There will likely be a feature added in the near future to explicitly define gro
 
 ## Crosstasking (via Psychic)
 
-Crosstest needs to be able to run tasks in any of the projects before it can run tests. Crosstest uses [psychic](https://github.com/crosstest/psychic-runner), to run tasks. Psychic creates a uniform interface for running similar tasks in different projects, delegating to project specific task runners (like Rake, Make, npm run, or gradle) when necessary.
+Crosstest needs to be able to run tasks in any of the projects before it can run tests. Crosstest uses [psychic](https://github.com/crosstest/psychic), to run tasks. Psychic creates a uniform interface for running similar tasks in different projects, delegating to project specific task runners (like Rake, Make, npm run, or gradle) when necessary.
 
 The first task you probably want to run is `bootstrap` in order to make sure the projects project is ready to test. Generally the `bootstrap` task will invoke a dependency manager like Bundler, npm, or pip.
 
@@ -199,7 +199,7 @@ $ bundle exec crosstest task lint
 -----> Crosstest is finished. (0m8.49s)
 ```
 
-This is equivalent to running `psychic task lint` in each directory. See [psychic](https://github.com/crosstest/psychic-runner) for more details about how psychic decides what command to invoke for any given task.
+This is equivalent to running `psychic task lint` in each directory. See [psychic](https://github.com/crosstest/psychic) for more details about how psychic decides what command to invoke for any given task.
 
 ### Workflows
 

@@ -20,9 +20,9 @@ require 'crosstest/documentation/helpers/code_helper'
 
 module Crosstest
   class Scenario < Crosstest::Dash # rubocop:disable ClassLength
-    include Crosstest::Util::FileSystem
-    include Crosstest::Logging
-    include Crosstest::Util::String
+    include Crosstest::Core::FileSystem
+    include Crosstest::Core::Logging
+    include Crosstest::Core::Util::String
     # View helpers
     include Crosstest::Documentation::Helpers::CodeHelper
 
@@ -66,7 +66,7 @@ module Crosstest
     end
 
     def runner
-      @runner ||= Psychic::Runner.new(cwd: basedir, logger: logger, env: environment_variables)
+      @runner ||= Crosstest::Psychic.new(cwd: basedir, logger: logger, env: environment_variables)
     end
 
     def environment_variables
@@ -141,7 +141,7 @@ module Crosstest
         evidence.result = Result.new(execution_result: execution_result, source_file: source_file.to_s)
       end
       result
-    rescue Psychic::Shell::ExecutionError => e
+    rescue Crosstest::Shell::ExecutionError => e
       execution_error = ExecutionError.new(e)
       execution_error.execution_result = e.execution_result
       evidence.error = Crosstest::Error.formatted_trace(e).join("\n")
@@ -164,7 +164,7 @@ module Crosstest
         verify
         # destroy if destroy_mode == :passing
       end
-      info "Finished testing #{slug} #{Util.duration(elapsed.real)}."
+      info "Finished testing #{slug} #{Core::Util.duration(elapsed.real)}."
       evidence.duration = elapsed.real
       save
       evidence = nil # it's saved, free up memory...
@@ -186,12 +186,12 @@ module Crosstest
           validation = validator.validate(self)
           status = case validation.result
                    when :passed
-                     Crosstest::Color.colorize("\u2713 Passed", :green)
+                     Core::Color.colorize("\u2713 Passed", :green)
                    when :failed
-                     Crosstest::Color.colorize('x Failed', :red)
+                     Core::Color.colorize('x Failed', :red)
                      Crosstest.handle_validation_failure(validation.error)
                    else
-                     Crosstest::Color.colorize(validation.result, :yellow)
+                     Core::Color.colorize(validation.result, :yellow)
                    end
           info format('%-50s %s', validator.description, status)
         end
@@ -203,7 +203,7 @@ module Crosstest
       elapsed = action(verb) { yield }
       # elapsed = action(verb) { |state| driver.public_send(verb, state) }
       info("Finished #{output_verb.downcase} #{slug}" \
-        " #{Util.duration(elapsed.real)}.")
+        " #{Core::Util.duration(elapsed.real)}.")
       # yield if block_given?
       self
     end

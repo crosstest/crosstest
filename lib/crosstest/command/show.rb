@@ -2,10 +2,10 @@ require 'crosstest/reporters'
 
 module Crosstest
   module Command
-    class Show < Crosstest::Command::Base
+    class Show < Crosstest::Command::Base # rubocop:disable Metrics/ClassLength
       include Crosstest::Reporters
-      include Crosstest::Util::String
-      include Crosstest::Util::FileSystem
+      include Crosstest::Core::Util::String
+      include Crosstest::Core::FileSystem
 
       def initialize(cmd_args, cmd_options, options = {})
         @indent_level = 0
@@ -24,7 +24,11 @@ module Crosstest
             status('Test suite', scenario.suite)
             status('Test scenario', scenario.name)
             status('Project', scenario.project.name)
-            source_file = scenario.absolute_source_file ? relativize(scenario.absolute_source_file, Dir.pwd) : colorize('<No code sample>', :red)
+            source_file = if scenario.absolute_source_file
+                            Core::FileSystem.relativize(scenario.absolute_source_file, Dir.pwd)
+                          else
+                            colorize('<No code sample>', :red)
+                          end
             status('Source', source_file)
             display_source(scenario)
             display_execution_result(scenario)

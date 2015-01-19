@@ -4,9 +4,9 @@ require 'English'
 module Crosstest
   module Command
     class Base # rubocop:disable ClassLength
-      include Crosstest::DefaultLogger
-      include Crosstest::Logging
-      include Crosstest::Util::FileSystem
+      include Core::DefaultLogger
+      include Crosstest::Core::Logging
+      include Crosstest::Core::FileSystem
 
       # Contstructs a new Command object.
       #

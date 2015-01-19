@@ -2,7 +2,7 @@ require 'fileutils'
 require 'logger'
 
 module Crosstest
-  class Logger
+  class ProjectLogger
     include ::Logger::Severity
 
     # @return [IO] the log device
@@ -31,18 +31,6 @@ module Crosstest
 
       self.progname = options[:progname] || 'Crosstest'
       self.level = options[:level] || default_log_level
-    end
-
-    def self.new_logger(project) # (test, project, index)
-      name = project.name # instance_name(test, project)
-      index = Crosstest.projects.index(project) || 0
-      Logger.new(
-        stdout: STDOUT,
-        color: Color::COLORS[index % Color::COLORS.size].to_sym,
-        logdev: File.join(Crosstest.configuration.log_root, "#{name}.log"),
-        level: Crosstest::Util.to_logger_level(Crosstest.configuration.log_level),
-        progname: name
-      )
     end
 
     class << self
@@ -234,7 +222,7 @@ module Crosstest
     # @return [Integer] the default logger level
     # @api private
     def default_log_level
-      Crosstest::Util.to_logger_level(Crosstest.configuration.log_level)
+      Crosstest::Core::Util.to_logger_level(Crosstest.configuration.log_level)
     end
 
     # Construct a new standard out logger.
@@ -244,10 +232,10 @@ module Crosstest
     # @return [StdoutLogger] a new logger
     # @api private
     def stdout_logger(stdout, color)
-      logger = StdoutLogger.new(stdout)
+      logger = Crosstest::Core::StdoutLogger.new(stdout)
       if Crosstest.tty?
         logger.formatter = proc do |_severity, _datetime, _progname, msg|
-          Color.colorize("#{msg}", color).concat("\n")
+          Core::Color.colorize("#{msg}", color).concat("\n")
         end
       else
         logger.formatter = proc do |_severity, _datetime, _progname, msg|
@@ -263,7 +251,7 @@ module Crosstest
     # @return [LogdevLogger] a new logger
     # @api private
     def logdev_logger(filepath_or_logdev)
-      LogdevLogger.new(resolve_logdev(filepath_or_logdev))
+      Crosstest::Core::LogdevLogger.new(resolve_logdev(filepath_or_logdev))
     end
 
     # Return an IO object from a filepath String or the IO object itself.
@@ -279,95 +267,6 @@ module Crosstest
         file
       else
         filepath_or_logdev
-      end
-    end
-
-    # Internal class which adds a #banner method call that displays the
-    # message with a callout arrow.
-    class LogdevLogger < ::Logger
-      alias_method :super_info, :info
-
-      # Dump one or more messages to info.
-      #
-      # @param msg [String] a message
-      def <<(msg)
-        @buffer ||= ''
-        lines, _, remainder = msg.rpartition("\n")
-        if lines.empty?
-          @buffer << remainder
-        else
-          lines.insert(0, @buffer)
-          lines.split("\n").each { |l| format_line(l.chomp) }
-          @buffer = ''
-        end
-      end
-
-      # Log a banner message.
-      #
-      # @param msg [String] a message
-      def banner(msg = nil, &block)
-        super_info("-----> #{msg}", &block)
-      end
-
-      private
-
-      # Reformat a line if it already contains log formatting.
-      #
-      # @param line [String] a message line
-      # @api private
-      def format_line(line)
-        case line
-        when /^-----> / then banner(line.gsub(/^[ >-]{6} /, ''))
-        when /^>>>>>> / then error(line.gsub(/^[ >-]{6} /, ''))
-        when /^       / then info(line.gsub(/^[ >-]{6} /, ''))
-        else info(line)
-        end
-      end
-    end
-
-    # Internal class which reformats logging methods for display as console
-    # output.
-    class StdoutLogger < LogdevLogger
-      # Log a debug message
-      #
-      # @param msg [String] a message
-      def debug(msg = nil, &block)
-        super("D      #{msg}", &block)
-      end
-
-      # Log an info message
-      #
-      # @param msg [String] a message
-      def info(msg = nil, &block)
-        super("       #{msg}", &block)
-      end
-
-      # Log a warn message
-      #
-      # @param msg [String] a message
-      def warn(msg = nil, &block)
-        super("$$$$$$ #{msg}", &block)
-      end
-
-      # Log an error message
-      #
-      # @param msg [String] a message
-      def error(msg = nil, &block)
-        super(">>>>>> #{msg}", &block)
-      end
-
-      # Log a fatal message
-      #
-      # @param msg [String] a message
-      def fatal(msg = nil, &block)
-        super("!!!!!! #{msg}", &block)
-      end
-
-      # Log an unknown message
-      #
-      # @param msg [String] a message
-      def unknown(msg = nil, &block)
-        super("?????? #{msg}", &block)
       end
     end
   end

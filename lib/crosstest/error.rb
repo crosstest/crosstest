@@ -236,7 +236,7 @@ module Crosstest
     # @api private
     def stderr_log(lines)
       Array(lines).each do |line|
-        $stderr.puts(Color.colorize(">>>>>> #{line}", :red))
+        $stderr.puts(Core::Color.colorize(">>>>>> #{line}", :red))
       end
     end
 

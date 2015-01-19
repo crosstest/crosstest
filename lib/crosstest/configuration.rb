@@ -20,7 +20,7 @@ module Crosstest
     end
 
     def default_logger
-      @default_logger ||= Logger.new(stdout: $stdout, level: env_log)
+      @default_logger ||= ProjectLogger.new(stdout: $stdout, level: env_log)
     end
 
     def manifest
@@ -66,7 +66,7 @@ module Crosstest
     # @api private
     def env_log
       level = ENV['CROSSTEST_LOG'] && ENV['CROSSTEST_LOG'].downcase.to_sym
-      level = Crosstest::Util.to_logger_level(level) unless level.nil?
+      level = Crosstest::Core::Util.to_logger_level(level) unless level.nil?
       level
     end
   end

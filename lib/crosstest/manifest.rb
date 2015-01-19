@@ -32,8 +32,8 @@ module Crosstest
   # values for that specific test.
   #
   class Manifest < Crosstest::ManifestSection
-    include Crosstest::DefaultLogger
-    include Crosstest::Logging
+    include Core::DefaultLogger
+    include Crosstest::Core::Logging
     include Hashie::Extensions::DeepMerge
 
     def initialize(hash = {})

@@ -33,7 +33,7 @@ module Crosstest
       end
     end
 
-    include Logging
+    include Core::Logging
     include PerformCommand
 
     # The maximum number of concurrent instances that can run--which is a bit

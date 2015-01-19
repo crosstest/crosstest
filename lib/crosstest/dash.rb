@@ -6,7 +6,7 @@ module Crosstest
     include Hashie::Extensions::Coercion
 
     def initialize(hash = {})
-      super Crosstest::Util.symbolized_hash(hash)
+      super Crosstest::Core::Util.symbolized_hash(hash)
     end
   end
 
