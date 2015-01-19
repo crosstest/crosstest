@@ -104,7 +104,7 @@ module Crosstest
         end
 
         def create_spy_reports
-          reports = Crosstest::Spies.reports[:dashboard]
+          reports = Crosstest::Skeptic::Spies.reports[:dashboard]
           reports.each do | report_class |
             if report_class.respond_to? :tab_name
               @active_tab = report_class.tab_name

@@ -1,4 +1,4 @@
-Fabricator(:validator, from: Crosstest::Validator) do
+Fabricator(:validator, from: Crosstest::Skeptic::Validator) do
   initialize_with do
     callback = @_transient_attributes.delete :callback
     desc = @_transient_attributes.delete :description

@@ -48,13 +48,13 @@ module Crosstest
     end
 
     def default_validator
-      @default_validator ||= Validator.new('default validator', suite: //, scenario: //, &default_validator_callback)
+      @default_validator ||= Skeptic::Validator.new('default validator', suite: //, scenario: //, &default_validator_callback)
     end
 
     attr_writer :default_validator_callback
 
     def register_spy(spy)
-      Crosstest::Spies.register_spy(spy)
+      Crosstest::Skeptic::Spies.register_spy(spy)
     end
 
     private

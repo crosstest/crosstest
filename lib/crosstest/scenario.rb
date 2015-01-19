@@ -80,11 +80,11 @@ module Crosstest
 
     def evidence(initial_data = {})
       evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.yaml").expand_path
-      @evidence ||= Evidence.load(evidence_file, initial_data)
+      @evidence ||= Skeptic::Evidence.load(evidence_file, initial_data)
     end
 
     def validators
-      Crosstest::ValidatorRegistry.validators_for self
+      Crosstest::Skeptic::ValidatorRegistry.validators_for self
     end
 
     def logger
@@ -135,10 +135,10 @@ module Crosstest
       end
     end
 
-    def run_scenario(spies = Crosstest::Spies)
+    def run_scenario(spies = Crosstest::Skeptic::Spies)
       spies.observe(self) do
         execution_result = runner.run_sample(source_file.to_s)
-        evidence.result = Result.new(execution_result: execution_result, source_file: source_file.to_s)
+        evidence.result = Skeptic::Result.new(execution_result: execution_result, source_file: source_file.to_s)
       end
       result
     rescue Crosstest::Shell::ExecutionError => e

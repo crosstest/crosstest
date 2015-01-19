@@ -14,7 +14,7 @@ module Crosstest
       it 'stores the result' do
         evidence = scenario.exec
         result = evidence[:result]
-        expect(result).to be_an_instance_of Result
+        expect(result).to be_an_instance_of Skeptic::Result
       end
     end
   end

@@ -4,22 +4,16 @@ require 'cause'
 require 'thor'
 require 'pathname'
 require 'crosstest/psychic'
+require 'crosstest/skeptic'
 require 'crosstest/project_logger'
 require 'crosstest/error'
 require 'crosstest/dash'
-require 'crosstest/validation'
-require 'crosstest/result'
-require 'crosstest/evidence'
-require 'crosstest/spies'
 require 'crosstest/project'
 require 'crosstest/scenario'
 require 'crosstest/scenarios'
 require 'crosstest/manifest'
 require 'crosstest/configuration'
-require 'crosstest/result'
 require 'crosstest/documentation_generator'
-require 'crosstest/validator'
-require 'crosstest/validator_registry'
 
 module Crosstest
   include Crosstest::Core::Logger
@@ -153,7 +147,7 @@ module Crosstest
 
     def reset
       @configuration = nil
-      Crosstest::ValidatorRegistry.clear
+      Crosstest::Skeptic::ValidatorRegistry.clear
     end
 
     # The {Crosstest::Manifest} that describes the test scenarios known to Crosstest.
@@ -166,13 +160,13 @@ module Crosstest
       manifest.projects.values
     end
 
-    # Registers a {Crosstest::Validator} that will be used during test
+    # Registers a {Crosstest::Skeptic::Validator} that will be used during test
     # execution on matching {Crosstest::Scenario}s.
     def validate(desc, scope = { suite: //, scenario: // }, &block)
       fail ArgumentError 'You must pass block' unless block_given?
-      validator = Crosstest::Validator.new(desc, scope, &block)
+      validator = Crosstest::Skeptic::Validator.new(desc, scope, &block)
 
-      Crosstest::ValidatorRegistry.register validator
+      Crosstest::Skeptic::ValidatorRegistry.register validator
       validator
     end
 
