@@ -1,0 +1,26 @@
+---
+global_env:                          # global_env defines input available for all scenarios
+  LOCALE: <%= ENV['LANG'] %>         # templating is allowed
+  FAVORITE_NUMBER: 5
+suites:
+  CLI:
+    samples:
+      - clone
+      - detect
+      - bootstrap
+      - exec
+      - verify
+      - test
+  Spies:
+    samples:
+      - built in spies
+      - custom spies
+  Reports:                           # "Katas" is the name of the first suite
+    samples:                         # samples defines the individual tests in a suite
+      - show
+      - dashboard
+      - code2doc
+      - custom spy report
+  Generate:
+    samples:
+      - slate docs

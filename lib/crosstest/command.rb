@@ -25,7 +25,7 @@ module Crosstest
         @options = cmd_options
         @action = options.fetch(:action, nil)
         @help = options.fetch(:help, -> { 'No help provided' })
-        @manifest_file = options.fetch('manifest', nil)
+        @project_set_file = options.fetch('file', nil)
         @loader = options.fetch(:loader, nil)
         @shell = options.fetch(:shell)
         @queue = Queue.new
@@ -54,12 +54,12 @@ module Crosstest
       attr_reader :action
 
       def setup
-        Crosstest.setup(options, @manifest_file)
+        Crosstest.setup(options, @project_set_file)
       end
 
-      def manifest
-        @manifest ||= Crosstest.configuration.manifest
-        @manifest
+      def project_set_file
+        @project_set_file ||= Crosstest.configuration.file
+        @project_set_file
       end
 
       # Emit an error message, display contextual help and then exit with a

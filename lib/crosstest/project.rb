@@ -7,8 +7,8 @@ module Crosstest
       super "Feature #{feature} is not implemented"
     end
   end
-  class Project < Crosstest::ManifestSection
-    class GitOptions < Crosstest::ManifestSection
+  class Project < Crosstest::Dash
+    class GitOptions < Crosstest::Dash
       property :repo, required: true
       property :branch
       property :to

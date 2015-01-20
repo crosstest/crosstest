@@ -6,7 +6,8 @@ Feature: Boostrapping
     Given the ruby project
     And the java project
     And the python project
-    And the hello_world crosstest config
+    And the sample crosstest config
+    And the hello_world skeptic config
     When I run `bundle exec crosstest bootstrap`
     Then the output should contain "-----> Bootstrapping java"
     Then the output should contain "-----> Bootstrapping python"
@@ -16,7 +17,8 @@ Feature: Boostrapping
     Given the ruby project
     And the java project
     And the python project
-    And the hello_world crosstest config
+    And the sample crosstest config
+    And the hello_world skeptic config
     When I run `bundle exec crosstest bootstrap "(java|ruby)"`
     Then the output should contain "-----> Bootstrapping java"
     Then the output should not contain "-----> Bootstrapping python"
@@ -26,7 +28,8 @@ Feature: Boostrapping
     Given the ruby project
     And the java project
     And the python project
-    And the hello_world crosstest config
+    And the sample crosstest config
+    And the hello_world skeptic config
     When I run `bundle exec crosstest bootstrap all hello`
     Then the output should contain "-----> Bootstrapping java"
     Then the output should contain "-----> Bootstrapping python"

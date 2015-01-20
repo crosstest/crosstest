@@ -13,10 +13,14 @@ module Crosstest
         class_option :log_level,
                      aliases: '-l',
                      desc: 'Set the log level (debug, info, warn, error, fatal)'
-        class_option :manifest,
-                     aliases: '-m',
-                     desc: 'The Crosstest test manifest file location',
+        class_option :file,
+                     aliases: '-f',
+                     desc: 'The Crosstest project set file',
                      default: 'crosstest.yaml'
+        class_option :skeptic,
+                     aliases: '-s',
+                     desc: 'The Skeptic test manifest file',
+                     default: 'skeptic.yaml'
         class_option :format,
                      aliases: '-f',
                      enum: %w(md rst),

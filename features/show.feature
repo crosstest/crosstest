@@ -4,7 +4,8 @@ Feature: Show
     Given the ruby project
     And the java project
     And the python project
-    And the hello_world crosstest config
+    And the sample crosstest config
+    And the hello_world skeptic config
     When I run `bundle exec crosstest show ruby 'hello world'`
     Then the output should contain:
     """

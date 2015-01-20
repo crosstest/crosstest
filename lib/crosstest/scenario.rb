@@ -35,7 +35,7 @@ module Crosstest
     property :basedir
     coerce_key :basedir, Pathname
     property :vars, default: {}
-    # coerce_key :vars, Crosstest::Manifest::Environment
+    # coerce_key :vars, Crosstest::TestManifest::Environment
 
     extend Forwardable
     def_delegators :evidence, :save

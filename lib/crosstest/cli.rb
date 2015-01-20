@@ -66,10 +66,14 @@ module Crosstest
                   desc: 'List output format',
                   enum: %w(text markdown json yaml),
                   default: 'text'
-    method_option :manifest,
-                  aliases: '-m',
-                  desc: 'The Crosstest test manifest file location',
+    method_option :file,
+                  aliases: '-f',
+                  desc: 'The Crosstest project set file',
                   default: 'crosstest.yaml'
+    method_option :skeptic,
+                  aliases: '-s',
+                  desc: 'The Skeptic test manifest file',
+                  default: 'skeptic.yaml'
     method_option :test_dir,
                   aliases: '-t',
                   desc: 'The Crosstest test directory',
@@ -88,10 +92,14 @@ module Crosstest
                   desc: 'List output format',
                   enum: %w(text markdown json yaml),
                   default: 'text'
-    method_option :manifest,
-                  aliases: '-m',
-                  desc: 'The Crosstest test manifest file location',
+    method_option :file,
+                  aliases: '-f',
+                  desc: 'The Crosstest project set file',
                   default: 'crosstest.yaml'
+    method_option :skeptic,
+                  aliases: '-s',
+                  desc: 'The Skeptic test manifest file',
+                  default: 'skeptic.yaml'
     method_option :test_dir,
                   aliases: '-t',
                   desc: 'The Crosstest test directory',
@@ -136,10 +144,14 @@ module Crosstest
       method_option :log_level,
                     aliases: '-l',
                     desc: 'Set the log level (debug, info, warn, error, fatal)'
-      method_option :manifest,
-                    aliases: '-m',
-                    desc: 'The Crosstest test manifest file location',
+      method_option :file,
+                    aliases: '-f',
+                    desc: 'The Crosstest project set file',
                     default: 'crosstest.yaml'
+      method_option :skeptic,
+                    aliases: '-s',
+                    desc: 'The Skeptic test manifest file',
+                    default: 'skeptic.yaml'
       method_option :test_dir,
                     aliases: '-t',
                     desc: 'The Crosstest test directory',
@@ -169,10 +181,14 @@ module Crosstest
     method_option :log_level,
                   aliases: '-l',
                   desc: 'Set the log level (debug, info, warn, error, fatal)'
-    method_option :manifest,
-                  aliases: '-m',
-                  desc: 'The Crosstest test manifest file location',
+    method_option :file,
+                  aliases: '-f',
+                  desc: 'The Crosstest project set file',
                   default: 'crosstest.yaml'
+    method_option :skeptic,
+                  aliases: '-s',
+                  desc: 'The Skeptic test manifest file',
+                  default: 'skeptic.yaml'
     method_option :test_dir,
                   aliases: '-t',
                   desc: 'The Crosstest test directory',
@@ -198,10 +214,14 @@ module Crosstest
     method_option :log_level,
                   aliases: '-l',
                   desc: 'Set the log level (debug, info, warn, error, fatal)'
-    method_option :manifest,
-                  aliases: '-m',
-                  desc: 'The Crosstest test manifest file location',
+    method_option :file,
+                  aliases: '-f',
+                  desc: 'The Crosstest project set file',
                   default: 'crosstest.yaml'
+    method_option :skeptic,
+                  aliases: '-s',
+                  desc: 'The Skeptic test manifest file',
+                  default: 'skeptic.yaml'
     def task(*args)
       update_config!
       action_options = options.dup

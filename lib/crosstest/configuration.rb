@@ -5,7 +5,7 @@ require 'rspec/expectations'
 module Crosstest
   RESOURCES_DIR = File.expand_path '../../../resources', __FILE__
 
-  class Configuration < Crosstest::ManifestSection
+  class Configuration < Crosstest::Dash
     property :dry_run,      default: false
     property :log_root,     default: '.crosstest/logs'
     property :log_level,    default: :info
@@ -23,17 +23,36 @@ module Crosstest
       @default_logger ||= ProjectLogger.new(stdout: $stdout, level: env_log)
     end
 
+    def project_set
+      @project_set ||= load_project_set('crosstest.yaml')
+    end
+
+    def project_set=(project_set_data)
+      if project_set_data.is_a? Skeptic::TestManifest
+        @project_set = project_set_data
+      else
+        @project_set = ProjectSet.from_yaml project_set_data
+      end
+      @project_set
+    rescue Errno::ENOENT => e
+      raise UserError, "Could not load test manifest: #{e.message}"
+    end
+
+    alias_method :load_project_set, :project_set=
+
     def manifest
-      @manifest ||= load_manifest('crosstest.yaml')
+      @manifest ||= load_manifest('skeptic.yaml')
     end
 
     def manifest=(manifest_data)
-      if manifest_data.is_a? Manifest
+      if manifest_data.is_a? Skeptic::TestManifest
         @manifest = manifest_data
       else
-        @manifest = Manifest.from_yaml manifest_data
+        @manifest = Skeptic::TestManifest.from_yaml manifest_data
       end
       @manifest
+    rescue Errno::ENOENT => e
+      raise UserError, "Could not load test manifest: #{e.message}"
     end
 
     alias_method :load_manifest, :manifest=

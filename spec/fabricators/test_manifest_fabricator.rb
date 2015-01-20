@@ -2,13 +2,10 @@ require 'hashie/mash'
 
 # Fabricates test manifests (.crosstest.yaml files)
 
-Fabricator(:manifest, from: Crosstest::Manifest) do
+Fabricator(:manifest, from: Crosstest::Skeptic::TestManifest) do
   initialize_with { @_klass.new to_hash } # Hash based initialization
   transient suite_count: 3
   transient samples_per_suite: 3
-  projects do
-    Fabricate(:project)
-  end
   global_env do
     {
       VAR1: 1,

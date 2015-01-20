@@ -14,7 +14,7 @@ module Crosstest
       property :spy_data, default: {}
       property :error
       property :vars, default: {}
-      # coerce_key :vars, Crosstest::Manifest::Environment
+      # coerce_key :vars, Crosstest::TestManifest::Environment
       property :duration
 
       # KEYS_TO_PERSIST = [:result, :spy_data, :error, :vars, :duration]

@@ -1,0 +1,16 @@
+---
+  global_env:
+    LOCALE: <%= ENV['LANG'] %>
+    FAVORITE_NUMBER: 5
+  suites:
+    Katas:
+      env:
+        NAME: 'Max'
+      samples:
+        - hello world
+        - quine
+    Tutorials:
+          env:
+          samples:
+            - deploying
+            - documenting

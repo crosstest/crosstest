@@ -1,17 +1,17 @@
 require 'crosstest/version'
 require 'crosstest/core'
+require 'crosstest/dash'
 require 'cause'
 require 'thor'
 require 'pathname'
 require 'crosstest/psychic'
 require 'crosstest/skeptic'
+require 'crosstest/project'
+require 'crosstest/project_set'
 require 'crosstest/project_logger'
 require 'crosstest/error'
-require 'crosstest/dash'
-require 'crosstest/project'
 require 'crosstest/scenario'
 require 'crosstest/scenarios'
-require 'crosstest/manifest'
 require 'crosstest/configuration'
 require 'crosstest/documentation_generator'
 
@@ -23,7 +23,8 @@ module Crosstest
   SUPPORTED_EXTENSIONS = %w(py rb js)
 
   class << self
-    DEFAULT_MANIFEST_FILE = 'crosstest.yaml'
+    DEFAULT_PROJECT_SET_FILE = 'crosstest.yaml'
+    DEFAULT_TEST_MANIFEST_FILE = 'skeptic.yaml'
 
     # @return [Mutex] a common mutex for global coordination
     attr_accessor :mutex
@@ -64,18 +65,26 @@ module Crosstest
       end
     end
 
-    def setup(options, manifest_file = DEFAULT_MANIFEST_FILE)
+    def setup(options, project_set_file = DEFAULT_PROJECT_SET_FILE, test_manifest_file = DEFAULT_TEST_MANIFEST_FILE)
       trap_interrupt
-      # manifest_file = File.expand_path manifest
-      if File.exist? manifest_file
-        logger.debug "Loading manifest file: #{manifest_file}"
-        @basedir = File.dirname manifest_file
-        Crosstest.configuration.manifest = manifest_file
+      # project_set_file = File.expand_path manifest
+      if File.exist? project_set_file
+        logger.debug "Loading project set file: #{project_set_file}"
+        @basedir = File.dirname project_set_file
+        Crosstest.configuration.project_set = project_set_file
       else
-        fail StandardError, "No manifest found at #{manifest_file}"
+        fail StandardError, "No project set found at #{project_set_file}"
       end
 
-      manifest.build_scenarios
+      if File.exist? test_manifest_file
+        logger.debug "Loading skeptic file: #{test_manifest_file}"
+        @basedir = File.dirname test_manifest_file
+        Crosstest.configuration.manifest = test_manifest_file
+      else
+        fail StandardError, "No project set found at #{project_set_file}"
+      end
+
+      manifest.build_scenarios(configuration.project_set.projects)
 
       test_dir = options[:test_dir] || File.expand_path('tests/crosstest/', Dir.pwd)
       autoload_crosstest_files(test_dir) unless test_dir.nil? || !File.directory?(test_dir)
@@ -150,14 +159,14 @@ module Crosstest
       Crosstest::Skeptic::ValidatorRegistry.clear
     end
 
-    # The {Crosstest::Manifest} that describes the test scenarios known to Crosstest.
+    # The {Crosstest::TestManifest} that describes the test scenarios known to Crosstest.
     def manifest
       configuration.manifest
     end
 
     # The set of {Crosstest::Project}s registered with Crosstest.
     def projects
-      manifest.projects.values
+      configuration.project_set.projects.values
     end
 
     # Registers a {Crosstest::Skeptic::Validator} that will be used during test
