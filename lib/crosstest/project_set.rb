@@ -1,7 +1,6 @@
 require 'yaml'
 require 'hashie/mash'
 require 'hashie/extensions/coercion'
-require 'hashie/extensions/deep_merge'
 
 module Crosstest
   # Crosstest::ProjectSet defines a set of projects that will be used for cross-project tasks
@@ -35,7 +34,6 @@ module Crosstest
   class ProjectSet < Crosstest::Dash
     include Core::DefaultLogger
     include Crosstest::Core::Logging
-    include Hashie::Extensions::DeepMerge
     extend Dash::Loadable
 
     property :projects, required: true

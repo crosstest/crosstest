@@ -1,7 +1,6 @@
 require 'yaml'
 require 'hashie/mash'
 require 'hashie/extensions/coercion'
-require 'hashie/extensions/deep_merge'
 
 module Crosstest
   # Crosstest::ProjectSet defines a set of projects that will be used for cross-project tasks
@@ -35,7 +34,6 @@ module Crosstest
   class ProjectSet < Crosstest::Dash
     include Core::DefaultLogger
     include Crosstest::Core::Logging
-    include Hashie::Extensions::DeepMerge
 
     property :projects, required: true
     coerce_key :projects, Hashie::Hash[String => Crosstest::Project]
@@ -45,15 +43,6 @@ module Crosstest
       projects.each do | name, project |
         project.name = name
       end
-    end
-
-    # Parses a YAML file to create a {TestManifest} object.
-    def self.from_yaml(yaml_file)
-      logger.debug "Loading #{yaml_file}"
-      raw_content = File.read(yaml_file)
-      processed_content = ERB.new(raw_content).result
-      data = YAML.load processed_content
-      new data
     end
   end
 end

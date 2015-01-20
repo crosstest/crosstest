@@ -1,7 +1,6 @@
 require 'yaml'
 require 'hashie/mash'
 require 'hashie/extensions/coercion'
-require 'hashie/extensions/deep_merge'
 
 module Crosstest
   module Skeptic
@@ -35,7 +34,6 @@ module Crosstest
     class TestManifest < Crosstest::Dash
       include Core::DefaultLogger
       include Crosstest::Core::Logging
-      include Hashie::Extensions::DeepMerge
       extend Crosstest::Dash::Loadable
 
       class Environment < Hashie::Mash
