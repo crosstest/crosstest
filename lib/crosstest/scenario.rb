@@ -26,16 +26,12 @@ module Crosstest
     # View helpers
     include Crosstest::Code2Doc::Helpers::CodeHelper
 
-    property :name
-    property :project, required: true
-    coerce_key :project, Crosstest::Project
-    property :suite, required: true
-    property :source_file
-    coerce_key :source_file, Pathname
-    property :basedir
-    coerce_key :basedir, Pathname
-    property :vars, default: {}
-    # coerce_key :vars, Crosstest::TestManifest::Environment
+    field :name, String
+    required_field :project, Crosstest::Project
+    required_field :suite, String, required: true
+    field :source_file, Pathname
+    field :basedir, Pathname
+    field :vars, Skeptic::TestManifest::Environment, default: {}
 
     extend Forwardable
     def_delegators :evidence, :save

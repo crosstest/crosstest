@@ -4,9 +4,9 @@ module Crosstest
       # TODO: Should we have (expectation) 'failed' vs (unexpected) 'error'?
       ALLOWABLE_STATES = %w(passed pending failed skipped)
 
-      property :result, required: true
-      property :error
-      property :error_source
+      required_field :result, Symbol
+      field :error, Object
+      field :error_source, Object
 
       def result=(state)
         state = state.to_s

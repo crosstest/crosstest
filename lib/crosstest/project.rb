@@ -1,9 +1,12 @@
 module Crosstest
   class Project < Crosstest::Core::Dash
+    include Crosstest::Core::Logging
+    include Crosstest::Core::FileSystem
+
     class GitOptions < Crosstest::Core::Dash
-      property :repo, required: true
-      property :branch
-      property :to
+      required_field :repo, String
+      field :branch, String
+      field :to, String
 
       def initialize(data)
         data = { repo: data } if data.is_a? String
@@ -11,14 +14,10 @@ module Crosstest
       end
     end
 
-    include Crosstest::Core::Logging
-    include Crosstest::Core::FileSystem
-    property :name
-    property :basedir, required: true
-    property :language
-    coerce_key :basedir, Pathname
-    property :git
-    coerce_key :git, GitOptions
+    field :name, String
+    field :basedir, Pathname, required: true
+    field :language, String
+    field :git, GitOptions
 
     attr_accessor :runner
 

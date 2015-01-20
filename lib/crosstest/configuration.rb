@@ -6,11 +6,9 @@ module Crosstest
   RESOURCES_DIR = File.expand_path '../../../resources', __FILE__
 
   class Configuration < Crosstest::Core::Dash
-    property :dry_run,      default: false
-    property :log_root,     default: '.crosstest/logs'
-    property :log_level,    default: :info
-    property :projects, default: []
-    # coerce_key :projects, Crosstest::Project
+    field :dry_run, Object, default: false
+    field :log_root, Pathname, default: '.crosstest/logs'
+    field :log_level, Symbol, default: :info
 
     # TODO: This should probably be configurable, or tied to Thor color options.
     if RSpec.respond_to?(:configuration)

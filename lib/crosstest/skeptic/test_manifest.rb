@@ -39,16 +39,13 @@ module Crosstest
       end
 
       class Suite < Crosstest::Core::Dash
-        property :env, default: {}
-        property :samples, required: true
-        coerce_key :samples, Array[String]
-        property :results
+        field :env, Environment, default: {}
+        field :samples, Array[String], required: true
+        field :results, Hash
       end
 
-      property :global_env
-      coerce_key :global_env, Environment
-      property :suites
-      coerce_key :suites, ::Hash[String => Suite]
+      field :global_env, Environment
+      field :suites, Hash[String => Suite]
 
       attr_accessor :scenarios
 

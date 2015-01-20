@@ -5,15 +5,13 @@ module Crosstest
       attr_reader :file_name
       attr_writer :autosave
 
-      property :last_attempted_action
-      property :last_completed_action
-      property :result
-      coerce_key :result, Crosstest::Skeptic::Result
-      property :spy_data, default: {}
-      property :error
-      property :vars, default: {}
-      # coerce_key :vars, Crosstest::TestManifest::Environment
-      property :duration
+      field :last_attempted_action, String
+      field :last_completed_action, String
+      field :result, Result
+      field :spy_data, Hash, default: {}
+      field :error, Object
+      field :vars, TestManifest::Environment, default: {}
+      field :duration, Numeric
 
       # KEYS_TO_PERSIST = [:result, :spy_data, :error, :vars, :duration]
 

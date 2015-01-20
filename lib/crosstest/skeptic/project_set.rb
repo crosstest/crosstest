@@ -33,8 +33,7 @@ module Crosstest
     include Core::DefaultLogger
     include Crosstest::Core::Logging
 
-    property :projects, required: true
-    coerce_key :projects, ::Hash[String => Crosstest::Project]
+    required_field :projects, Hash[String => Crosstest::Project]
 
     def initialize(hash = {})
       super
