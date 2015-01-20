@@ -1,8 +1,6 @@
-require 'hashie/dash'
-
 module Crosstest
   module Skeptic
-    class Validation < Crosstest::Dash
+    class Validation < Crosstest::Core::Dash
       # TODO: Should we have (expectation) 'failed' vs (unexpected) 'error'?
       ALLOWABLE_STATES = %w(passed pending failed skipped)
 

@@ -1,11 +1,7 @@
-require 'hashie/dash'
-require 'hashie/extensions/coercion'
-
 module Crosstest
   module Skeptic
-    class Result < Hashie::Dash
+    class Result < Crosstest::Core::Dash
       extend Forwardable
-      include Hashie::Extensions::Coercion
 
       property :execution_result # , required: true
       coerce_key :execution_result, Crosstest::Shell::ExecutionResult
@@ -13,7 +9,7 @@ module Crosstest
       property :source_file # , required: true
       property :data
       property :validations, default: {}
-      coerce_key :validations, Hashie::Hash[String => Validation]
+      coerce_key :validations, ::Hash[String => Validation]
 
       def status
         # A feature can be validated by different suites, or manually vs an automated suite.

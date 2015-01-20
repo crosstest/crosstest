@@ -139,6 +139,12 @@ module Crosstest
     attr_accessor :execution_result
   end
 
+  class FeatureNotImplementedError < StandardError
+    def initialize(feature)
+      super "Feature #{feature} is not implemented"
+    end
+  end
+
   class << self
     # Yields to a code block in order to consistently emit a useful crash/error
     # message and exit appropriately. There are two primary failure conditions:

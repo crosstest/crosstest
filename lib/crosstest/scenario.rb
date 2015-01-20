@@ -19,7 +19,7 @@ require 'crosstest/code2doc/helpers/code_helper'
 #   this file. It's responsible for managing the test lifecycle.
 
 module Crosstest
-  class Scenario < Crosstest::Dash # rubocop:disable ClassLength
+  class Scenario < Crosstest::Core::Dash # rubocop:disable ClassLength
     include Crosstest::Core::FileSystem
     include Crosstest::Core::Logging
     include Crosstest::Core::Util::String

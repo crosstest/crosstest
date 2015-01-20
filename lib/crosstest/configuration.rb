@@ -5,7 +5,7 @@ require 'rspec/expectations'
 module Crosstest
   RESOURCES_DIR = File.expand_path '../../../resources', __FILE__
 
-  class Configuration < Crosstest::Dash
+  class Configuration < Crosstest::Core::Dash
     property :dry_run,      default: false
     property :log_root,     default: '.crosstest/logs'
     property :log_level,    default: :info

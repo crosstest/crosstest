@@ -17,7 +17,7 @@ module Crosstest
         end
 
         it 'parses suites' do
-          expect(manifest.suites).to be_an_instance_of Hashie::Hash
+          expect(manifest.suites).to be_an_instance_of ::Hash
           manifest.suites.each_value do | suite |
             expect(suite).to be_an_instance_of TestManifest::Suite
           end

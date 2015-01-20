@@ -1,14 +1,6 @@
-require 'hashie/dash'
-require 'hashie/extensions/coercion'
-
 module Crosstest
-  class FeatureNotImplementedError < StandardError
-    def initialize(feature)
-      super "Feature #{feature} is not implemented"
-    end
-  end
-  class Project < Crosstest::Dash
-    class GitOptions < Crosstest::Dash
+  class Project < Crosstest::Core::Dash
+    class GitOptions < Crosstest::Core::Dash
       property :repo, required: true
       property :branch
       property :to
@@ -31,8 +23,8 @@ module Crosstest
     attr_accessor :runner
 
     def initialize(data)
-      data[:basedir] = File.absolute_path(data[:basedir])
       super
+      self.basedir = File.absolute_path(basedir)
     end
 
     def runner

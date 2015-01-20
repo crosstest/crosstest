@@ -1,6 +1,4 @@
 require 'yaml'
-require 'hashie/mash'
-require 'hashie/extensions/coercion'
 
 module Crosstest
   # Crosstest::ProjectSet defines a set of projects that will be used for cross-project tasks
@@ -31,12 +29,12 @@ module Crosstest
   # The *global_env* values will be made available to all tests as environment variables, along with the *env*
   # values for that specific test.
   #
-  class ProjectSet < Crosstest::Dash
+  class ProjectSet < Crosstest::Core::Dash
     include Core::DefaultLogger
     include Crosstest::Core::Logging
 
     property :projects, required: true
-    coerce_key :projects, Hashie::Hash[String => Crosstest::Project]
+    coerce_key :projects, ::Hash[String => Crosstest::Project]
 
     def initialize(hash = {})
       super

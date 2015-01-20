@@ -1,9 +1,7 @@
-require 'hashie'
-
 module Crosstest
   module Skeptic
     class EvidenceFileLoadError < StandardError; end
-    class Evidence < Crosstest::Dash
+    class Evidence < Crosstest::Core::Dash
       attr_reader :file_name
       attr_writer :autosave
 
@@ -35,7 +33,7 @@ module Crosstest
 
       def self.load(file_name, initial_data)
         if File.exist?(file_name)
-          existing_data = Hashie::Mash.load(file_name)
+          existing_data = Crosstest::Core::Mash.load(file_name)
           initial_data.merge!(existing_data)
         end
         Evidence.new(file_name, initial_data)

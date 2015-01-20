@@ -1,6 +1,4 @@
 require 'yaml'
-require 'hashie/mash'
-require 'hashie/extensions/coercion'
 
 module Crosstest
   module Skeptic
@@ -31,17 +29,16 @@ module Crosstest
     # The *global_env* values will be made available to all tests as environment variables, along with the *env*
     # values for that specific test.
     #
-    class TestManifest < Crosstest::Dash
+    class TestManifest < Crosstest::Core::Dash
       include Core::DefaultLogger
       include Crosstest::Core::Logging
-      extend Crosstest::Dash::Loadable
+      extend Crosstest::Core::Dash::Loadable
 
-      class Environment < Hashie::Mash
-        include Hashie::Extensions::Coercion
+      class Environment < Crosstest::Core::Mash
         coerce_value Integer, String
       end
 
-      class Suite < Crosstest::Dash
+      class Suite < Crosstest::Core::Dash
         property :env, default: {}
         property :samples, required: true
         coerce_key :samples, Array[String]
@@ -51,7 +48,7 @@ module Crosstest
       property :global_env
       coerce_key :global_env, Environment
       property :suites
-      coerce_key :suites, Hashie::Hash[String => Suite]
+      coerce_key :suites, ::Hash[String => Suite]
 
       attr_accessor :scenarios
 
