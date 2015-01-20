@@ -67,22 +67,14 @@ module Crosstest
 
     def setup(options, project_set_file = DEFAULT_PROJECT_SET_FILE, test_manifest_file = DEFAULT_TEST_MANIFEST_FILE)
       trap_interrupt
-      # project_set_file = File.expand_path manifest
-      if File.exist? project_set_file
-        logger.debug "Loading project set file: #{project_set_file}"
-        @basedir = File.dirname project_set_file
-        Crosstest.configuration.project_set = project_set_file
-      else
-        fail StandardError, "No project set found at #{project_set_file}"
-      end
 
-      if File.exist? test_manifest_file
-        logger.debug "Loading skeptic file: #{test_manifest_file}"
-        @basedir = File.dirname test_manifest_file
-        Crosstest.configuration.manifest = test_manifest_file
-      else
-        fail StandardError, "No project set found at #{project_set_file}"
-      end
+      # logger.debug "Loading project set file: #{project_set_file}"
+      @basedir = File.dirname project_set_file
+      Crosstest.configuration.project_set = project_set_file
+
+      # logger.debug "Loading skeptic file: #{test_manifest_file}"
+      @basedir = File.dirname test_manifest_file
+      Crosstest.configuration.manifest = test_manifest_file
 
       manifest.build_scenarios(configuration.project_set.projects)
 

@@ -1,0 +1,11 @@
+---
+  projects:
+    ruby:
+      language: 'ruby'
+      basedir: 'sdks/ruby'
+    java:
+      language: 'java'
+      basedir: 'sdks/java'
+    python:
+      language: 'python'
+      basedir: 'sdks/python'
