@@ -7,7 +7,6 @@ module Crosstest
       class Documentation < Thor::Group
         include Thor::Actions
         include Crosstest::Core::FileSystem
-        include Crosstest::Core::FileSystem
         include Crosstest::Code2Doc::Helpers::CodeHelper
 
         BUILTIN_GENERATORS = Dir["#{Crosstest::Reporters::GENERATORS_DIR}/*"].select { |f| File.directory? f }

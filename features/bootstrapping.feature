@@ -23,14 +23,3 @@ Feature: Boostrapping
     Then the output should contain "-----> Bootstrapping java"
     Then the output should not contain "-----> Bootstrapping python"
     Then the output should contain "-----> Bootstrapping ruby"
-
-  Scenario: Bootstrapping by scenario
-    Given the ruby project
-    And the java project
-    And the python project
-    And the sample crosstest config
-    And the hello_world skeptic config
-    When I run `bundle exec crosstest bootstrap all hello`
-    Then the output should contain "-----> Bootstrapping java"
-    Then the output should contain "-----> Bootstrapping python"
-    Then the output should contain "-----> Bootstrapping ruby"

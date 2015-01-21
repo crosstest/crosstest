@@ -2,7 +2,7 @@ require 'benchmark'
 
 module Crosstest
   module Command
-    class Action < Crosstest::Command::Base
+    class ScenarioAction < Crosstest::Command::Base
       include RunAction
 
       IMPLEMENTOR_ACTIONS = [:clone, :bootstrap, :task] # These are run once per project, not per test
@@ -14,11 +14,7 @@ module Crosstest
           setup
           tests = parse_subcommand(args.shift, args.shift)
           projects = tests.map(&:project).uniq
-          if IMPLEMENTOR_ACTIONS.include? action # actions on projects
-            run_action(action, projects)
-          else # actions on tests
-            run_action(action, tests)
-          end
+          run_action(tests)
         end
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end

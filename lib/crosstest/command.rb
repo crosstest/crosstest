@@ -75,6 +75,12 @@ module Crosstest
         exit 1
       end
 
+      def select_projects(project_regexp = 'all', options = {})
+        projects = Crosstest.filter_projects(project_regexp, options)
+        die "No projects matching regex `#{project_regexp}', known projects: #{Crosstest.projects.map(&:name)}" if projects.empty?
+        projects
+      end
+
       # Return an array on scenarios whos name matches the regular expression,
       # the full instance name, or  the `"all"` literal.
       #
@@ -83,8 +89,7 @@ module Crosstest
       # @return [Array<Instance>] an array of scenarios
       # @api private
       def parse_subcommand(project_regexp = 'all', scenario_regexp = 'all', options = {})
-        projects = Crosstest.filter_projects(project_regexp, options)
-        die "No projects matching regex `#{project_regexp}', known projects: #{Crosstest.projects.map(&:name)}" if projects.empty?
+        projects = select_projects(project_regexp, options)
         scenarios = Crosstest.filter_scenarios(scenario_regexp, options)
         die "No scenarios for regex `#{scenario_regexp}', try running `crosstest list'" if scenarios.empty?
         scenarios.keep_if do |s|
@@ -99,22 +104,21 @@ module Crosstest
 
     # Common module to execute a Crosstest action such as create, converge, etc.
     module RunAction
-      # Run an instance action (create, converge, setup, verify, destroy) on
-      # a collection of scenarios. The instance actions will take place in a
-      # seperate thread of execution which may or may not be running
-      # concurrently.
+      # Run an action on each member of the collection. The collection could
+      # be Projects (e.g. clone, bootstrap) or Scenarios (e.g. test, clean).
+      # The instance actions will take place in a seperate thread of execution
+      # which may or may not be running concurrently.
       #
-      # @param action [String] action to perform
-      # @param scenarios [Array<Instance>] an array of scenarios
-      def run_action(_action, scenarios, *args)
+      # @param collection [Array] an array of objections on which to perform the action
+      def run_action(collection, *args)
         @args.concat args
         concurrency = 1
         if options[:concurrency]
-          concurrency = options[:concurrency] || scenarios.size
-          concurrency = scenarios.size if concurrency > scenarios.size
+          concurrency = options[:concurrency] || collection.size
+          concurrency = collection.size if concurrency > collection.size
         end
 
-        scenarios.each { |i| @queue << i }
+        collection.each { |i| @queue << i }
         concurrency.times { @queue << nil }
 
         errors = []

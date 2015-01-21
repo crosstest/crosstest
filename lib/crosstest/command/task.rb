@@ -2,7 +2,7 @@ require 'benchmark'
 
 module Crosstest
   module Command
-    class ProjectAction < Crosstest::Command::Base
+    class Task < Crosstest::Command::Base
       include RunAction
 
       # Invoke the command.
@@ -10,9 +10,10 @@ module Crosstest
         banner "Starting Crosstest (v#{Crosstest::VERSION})"
         elapsed = Benchmark.measure do
           setup
+          task = args.shift
           project_regex = args.shift
-          projects = select_projects(project_regex, options)
-          run_action(projects, *args)
+          projects = Crosstest.filter_projects(project_regex)
+          run_action(projects, task)
         end
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end

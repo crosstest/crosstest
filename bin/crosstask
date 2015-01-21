@@ -2,4 +2,4 @@
 require 'crosstest/error'
 require 'crosstest/cli'
 
-Crosstest.with_friendly_errors { Crosstest::CLI::CrosstestCLI.start }
+Crosstest.with_friendly_errors { Crosstest::CLI::CrosstaskCLI.start }
