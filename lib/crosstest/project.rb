@@ -56,7 +56,7 @@ module Crosstest
       else
         banner "Running task #{task_name} for #{name}"
       end
-      fail "Project #{task_name} has not been cloned" unless cloned?
+      fail "Project #{name} has not been cloned" unless cloned?
       runner.execute_task(task_name)
     rescue Crosstest::Psychic::TaskNotImplementedError => e
       logger.error("Could not run task #{task_name} for #{name}: #{e.message}")

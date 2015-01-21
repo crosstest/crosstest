@@ -6,7 +6,7 @@ require 'cucumber'
 require 'cucumber/rake/task'
 require 'rubocop/rake_task'
 
-task default: [:spec, :features, :self, :rubocop]
+task default: [:self, :spec, :features, :rubocop]
 
 RSpec::Core::RakeTask.new('spec') do |t|
   t.rspec_opts = '-f documentation'
@@ -24,6 +24,7 @@ end
 
 desc 'Self-test and self-document'
 task :self do
+  sh 'bundle exec crosstest bootstrap'
   sh 'bundle exec crosstest test'
 end
 

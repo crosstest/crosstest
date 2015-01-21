@@ -8,7 +8,7 @@ module Crosstest
       subject { ThorSpy.on(described_class, kernel) }
       describe 'bootstrap' do
         context 'with no args' do
-          it 'calls bootstrap on each project' do
+          xit 'calls bootstrap on each project' do
             expect(kernel).to receive(:exit).with(0)
             # TODO: Any way to test each project is called? We can't use
             # `Crosstest.projects` because it will be reloaded.
