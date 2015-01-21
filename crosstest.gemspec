@@ -18,7 +18,6 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'thor', '~> 0.19'
   spec.add_dependency 'crosstest-core', '~> 0'
   spec.add_dependency 'crosstest-psychic', '>= 0.0.4'
   spec.add_dependency 'logging', '~> 1.8'
@@ -29,8 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hashie', '~> 3.0'
   spec.add_dependency 'padrino-helpers', '~> 0.12'
   spec.add_dependency 'erubis', '~> 2.7'
-  spec.add_dependency 'cause', '~> 0.1'
-  spec.add_dependency 'rouge', '~> 1.7'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'bundler', '~> 1.5'
   spec.add_development_dependency 'rake'
