@@ -2,7 +2,7 @@ version: 0.0.{build}
 init:
 - gem install bundler --quiet --no-ri --no-rdoc
 install:
-- bundle install
+- PowerShell -NoProfile -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1
 build: off
 test_script:
 - bundle exec rake

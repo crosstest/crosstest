@@ -24,7 +24,6 @@ end
 
 desc 'Self-test and self-document'
 task :self do
-  sh 'bundle exec crosstest bootstrap'
   sh 'bundle exec crosstest test'
 end
 
