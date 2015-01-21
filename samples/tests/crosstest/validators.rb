@@ -5,7 +5,13 @@ Crosstest.validate 'Hello world validator', suite: 'Katas', scenario: 'hello wor
 end
 
 Crosstest.validate 'Quine output matches source code', suite: 'Katas', scenario: 'quine' do |scenario|
-  expect(scenario.result.stdout).to eq(scenario.source)
+  code = scenario.source
+  output = scenario.result.stdout
+  [code, output].each do | str |
+    # Standardize newlines...
+    str.gsub!(/[\r\n]+/, "\n")
+  end
+  expect(output).to eq(code)
 end
 
 Crosstest.validate 'default validator' do |scenario|
