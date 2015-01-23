@@ -3,6 +3,6 @@ theme: readthedocs
 pages:
   - index.md
   - project_sets.md
-  - crosstask.md
-  - crosstest.md
+  - usage/crosstask.md
+  - usage/crosstest.md
 
