@@ -230,6 +230,8 @@ module Crosstest
                     aliases: '-s',
                     desc: 'The Skeptic test manifest file',
                     default: 'skeptic.yaml'
+      method_option :source,
+                    desc: 'Display the source code for the sample'
       method_option :test_dir,
                     aliases: '-t',
                     desc: 'The Crosstest test directory',

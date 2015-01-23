@@ -20,6 +20,10 @@ module Crosstest
         end
       end
 
+      def error_source?
+        !error_source.nil?
+      end
+
       def to_hash(*args)
         self.error_source = error.error_source if error.respond_to? :error_source
         super

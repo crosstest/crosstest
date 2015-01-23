@@ -70,7 +70,7 @@ module Crosstest
       Crosstest.configuration.project_set = project_set_file
 
       # logger.debug "Loading skeptic file: #{test_manifest_file}"
-      @basedir = File.dirname test_manifest_file
+      # @basedir = File.dirname test_manifest_file
       Crosstest.configuration.manifest = test_manifest_file
 
       manifest.build_scenarios(configuration.project_set.projects)

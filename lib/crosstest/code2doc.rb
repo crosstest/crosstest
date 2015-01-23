@@ -22,7 +22,9 @@ module Crosstest
       end
 
       def exec_snippet(command, opts = {})
-        result = Crosstest.global_runner.execute(command)
+        cwd = opts.delete(:cwd) || '.'
+        psychic = Crosstest::Psychic.new(cwd: cwd)
+        result = psychic.execute(command)
         snippetize_output(result, opts)
       end
 

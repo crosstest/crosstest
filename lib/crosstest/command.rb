@@ -26,6 +26,7 @@ module Crosstest
         @action = options.fetch(:action, nil)
         @help = options.fetch(:help, -> { 'No help provided' })
         @project_set_file = options.fetch('file', nil)
+        @skeptic_file = options.fetch('skeptic', nil)
         @loader = options.fetch(:loader, nil)
         @shell = options.fetch(:shell)
         @queue = Queue.new
@@ -54,7 +55,7 @@ module Crosstest
       attr_reader :action
 
       def setup
-        Crosstest.setup(options, @project_set_file)
+        Crosstest.setup(options, @project_set_file, @skeptic_file)
       end
 
       def project_set_file
