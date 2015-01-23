@@ -3,6 +3,7 @@ module Crosstest
     class Result < Crosstest::Core::Dash
       extend Forwardable
 
+      field :command, String
       field :execution_result, Crosstest::Shell::ExecutionResult
       def_delegators :execution_result, :stdout, :stderr, :exitstatus
       field :source_file, Pathname

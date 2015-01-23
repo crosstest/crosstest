@@ -74,7 +74,8 @@ module Crosstest
           extensions: %w(rb)
         },
         'scala'         =>  C_STYLE_COMMENTS,
-        'scheme'        =>  { single: ';;',  multi: nil, heredoc: nil, extensions: %w(schema) },
+        'scheme'        =>  { single: ';;',  multi: nil, heredoc: nil, extensions: %w(scheme) },
+        'yaml'        =>  { single: '#',  multi: nil, heredoc: nil, extensions: %w(yaml) },
         'xml'           =>  {
           single: nil,
           multi: { start: '<!--', middle: nil, end: '-->' },

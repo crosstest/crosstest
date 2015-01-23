@@ -78,7 +78,7 @@ module Crosstest
 
         describe '#code_block' do
           it 'generates markdown code blocks by default' do
-            expected = "\n```ruby\n" + source + "\n```\n\n"
+            expected = "```ruby\n" + source + "\n```\n"
             code_block = scenario.code_block(scenario.source, 'ruby')
             expect(code_block).to eq(expected)
           end

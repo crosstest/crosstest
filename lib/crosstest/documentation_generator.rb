@@ -39,26 +39,30 @@ module Crosstest
 
     def code2doc(source_file, language = nil)
       source_code = File.read(source_file)
-      if language.nil?
-        language, comment_style = Code2Doc::CommentStyles.infer File.extname(source_file)
-        segmenter_language = comment_style[:language] || language
-      else
-        segmenter_language = language
-      end
+      segmenter_language ||= infer_language(source_file)
 
       buffer = StringIO.new
       segmenter_options = {
-        language: segmenter_language
+        language: language
       }
       segmenter = Crosstest::Code2Doc::CodeSegmenter.new(segmenter_options)
       segments = segmenter.segment source_code
       segments.each do |comment, code|
         comment = comment.join("\n")
         code = code.join("\n")
-        buffer.puts comment unless comment.empty?
-        buffer.puts code_block code, language unless code.empty?
+        code = code_block(code, language) unless code.empty?
+        next if comment.empty? && code.empty?
+        code = "\n#{code}\n" if !comment.empty? && !code.empty? # Markdown needs separation
+        buffer.puts [comment, code].join("\n")
       end
       buffer.string
+    end
+
+    private
+
+    def infer_language(source_file)
+      language, comment_style = Code2Doc::CommentStyles.infer File.extname(source_file)
+      segmenter_language = comment_style[:language] || language
     end
   end
 end

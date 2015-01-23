@@ -1,0 +1,8 @@
+site_name: Crosstest
+theme: readthedocs
+pages:
+  - index.md
+  - project_sets.md
+  - crosstask.md
+  - crosstest.md
+

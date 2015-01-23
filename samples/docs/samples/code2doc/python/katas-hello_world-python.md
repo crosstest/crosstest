@@ -1,5 +1,0 @@
-
-```py
-print 'Hello, world!'
-```
-

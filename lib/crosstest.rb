@@ -2,6 +2,7 @@ require 'crosstest/version'
 require 'crosstest/core'
 require 'crosstest/psychic'
 require 'crosstest/skeptic'
+require 'crosstest/code2doc'
 require 'crosstest/project'
 require 'crosstest/project_set'
 require 'crosstest/project_logger'
@@ -77,6 +78,19 @@ module Crosstest
       test_dir = options[:test_dir] || File.expand_path('tests/crosstest/', Dir.pwd)
       autoload_crosstest_files(test_dir) unless test_dir.nil? || !File.directory?(test_dir)
       manifest
+    end
+
+    def scenario(pattern)
+      s = select_scenarios(pattern)
+      case s.size
+      when 1
+        return s.first
+      when 0
+        fail "No scenarios match #{pattern}"
+      else
+        matches = s.map(&:name).join(', ')
+        fail "Multiple scenarios matched #{pattern}: #{matches}"
+      end
     end
 
     def select_scenarios(regexp)

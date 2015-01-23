@@ -6,7 +6,7 @@ module Crosstest
     let(:expected_project_dir) { 'samples/sdks/foo' }
     let(:runner) { double('runner') }
     let(:global_runner) { double('global runner') }
-    let(:expected_project_path) { Pathname.new(File.absolute_path(expected_project_dir)) }
+    let(:expected_project_path) { Pathname.new(expected_project_dir) }
 
     before do
       subject.runner = runner

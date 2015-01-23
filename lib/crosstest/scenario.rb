@@ -133,8 +133,10 @@ module Crosstest
 
     def run_scenario(spies = Crosstest::Skeptic::Spies)
       spies.observe(self) do
+        sample = runner.find_sample(source_file.to_s)
+        command = runner.command_for_sample(sample)
         execution_result = runner.run_sample(source_file.to_s)
-        evidence.result = Skeptic::Result.new(execution_result: execution_result, source_file: source_file.to_s)
+        evidence.result = Skeptic::Result.new(execution_result: execution_result, source_file: source_file.to_s, command: command)
       end
       result
     rescue Crosstest::Shell::ExecutionError => e

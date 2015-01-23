@@ -1,0 +1,50 @@
+## Crosstesting (via Skeptic)
+
+The `crosstest test` command will the same tests in each project, using spies to capture data and validate the behavior. This is for running tests that are shared across all projects to test for shared behavior. You can use `crosstask` to run each projects own test.
+
+Currently this is used for testing a code sample for each scenario. Crosstest will run the sample and capture the process's exit code, stdout and stderr. You can register additional "spies" with skeptic in order to capture additional information or perform additional validation. For example, there are spies that use the [Pacto](https://github.com/thoughtworks/pacto) project to capture HTTP requests and compare them with the RESTful services that were expected to be called for the scenario.
+
+### Defining test scenarios
+
+Crosstest uses [Skeptic](https://github.com/crosstest/skeptic) to run tests, so the test scenarios are listed in a file called `skeptic.yaml`. The `suites` section of skeptic.yaml defines the tests you want to run. The suites contain scenarios ("samples"). Here is a simple file that defines a few scenarios:
+
+<%= Crosstest::Code2Doc.file_snippet 'samples/skeptic_simple.yaml' %>
+
+You can also define properties for running samples with the "global_env" and "env" on suites. Here's a more complete example that shows defines some properties:
+
+<%= Crosstest::Code2Doc.file_snippet 'samples/skeptic.yaml' %>
+
+### Available Commands
+
+You can always see the available commands by running:
+<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest help' %>
+Y
+
+Most crosstest commands take two opertional arguments. The first argument is for selecting a project. See the documentation on [Project Sets](project_sets) for more information. The second argument is for selecting scenarios. It works similar to selecting projects:
+
+### Listing Tests
+
+Crosstest keeps track of the test results so you don't need to test all projects or scenarios in a single run. You can use the command `crosstest list` to get quick summary of the latest results on the command line.
+
+<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest list' %>
+
+As with
+The command `crosstest list` will display a summary of the test
+
+
+The `suites` section of crosstest.yaml defines the tests you want to run. The suites contain scenarios ("samples") and default properties to use as input while testing the code samples ("global_env" and "env" within suites).
+
+```yaml
+  global_env:                          # global_env defines input available for all scenarios
+    LOCALE: <%= ENV['LANG'] %>         # templating is allowed
+  suites:
+    Katas:                             # "Katas" is the name of the first test suite
+      samples:                         # Test scenarios within Katas
+        - hello world
+        - quine
+    Environment:
+      env:                             # Unlike global_env, these variables are only for the Katas suite
+        COLOR: red
+      samples:
+        - echo_color
+```

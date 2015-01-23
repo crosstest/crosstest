@@ -1,0 +1,8 @@
+---
+  projects:
+    ruby:
+      basedir: 'projects/ruby_samples'
+    java:
+      basedir: 'projects/java_samples'
+    python:
+      basedir: 'projects/python_samples'

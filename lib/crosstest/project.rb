@@ -41,6 +41,7 @@ module Crosstest
       end
       branch = git.branch ||= 'master'
       target_dir = git.to ||= basedir
+      target_dir = Crosstest::Core::FileSystem.relativize(target_dir, Crosstest.basedir)
       if File.exist? target_dir
         logger.info "Skipping clone because #{target_dir} already exists"
       else

@@ -49,14 +49,16 @@ module Crosstest
 
       attr_accessor :scenarios
 
-      def build_scenarios(projects)
+      def scenarios
         @scenarios ||= Scenarios.new
+      end
 
+      def build_scenarios(projects)
         suites.each do | suite_name, suite |
           suite.samples.each do | sample |
             projects.each_value do | project |
               scenario = project.build_scenario suite: suite_name, name: sample, vars: suite.env
-              @scenarios[scenario.slug] = scenario
+              scenarios[scenario.slug] = scenario
             end
           end
         end

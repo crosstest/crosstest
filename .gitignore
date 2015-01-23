@@ -10,6 +10,8 @@ node_modules/
 /crosstest/
 pkg/
 coverage/
+docs/
+site/
 .yardoc/
 .crosstest/
 bower_components/

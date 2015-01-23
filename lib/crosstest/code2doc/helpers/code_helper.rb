@@ -19,17 +19,11 @@ module Crosstest
         class MarkdownHelper
           def self.code_block(source, language)
             buffer = StringIO.new
-            buffer.puts # I've seen lots of rendering issues without a dividing newline
             buffer.puts "```#{language}"
             buffer.puts source
             buffer.puts '```'
-            buffer.puts # Put a dividing newline after as well, to be safe...
             buffer.string
           end
-        end
-        def initialize(*args)
-          @segmenter = Crosstest::Code2Doc::CodeSegmenter.new
-          super
         end
 
         def source
@@ -50,14 +44,16 @@ module Crosstest
             ReStructuredTextHelper.code_block source_code, language
           when :markdown
             MarkdownHelper.code_block source_code, language
+          when :raw
+            source_code
           else
-            fail IllegalArgumentError, "Unknown format: #{format}"
+            fail ArgumentError, "Unknown format: #{opts[:format]}"
           end
         end
 
         # Loses proper indentation on comments
         def snippet_after(matcher)
-          segments = @segmenter.segment(source)
+          segments = segmenter.segment(source)
           buffer = StringIO.new
           segment = segments.find do |s|
             doc_segment_content = s.first.join
@@ -68,7 +64,7 @@ module Crosstest
         end
 
         def snippet_between(before_matcher, after_matcher)
-          segments = @segmenter.segment(source)
+          segments = segmenter.segment(source)
           start_segment = find_segment_index segments, before_matcher
           end_segment   = find_segment_index segments, after_matcher
           buffer = StringIO.new
@@ -83,6 +79,10 @@ module Crosstest
         end
 
         private
+
+        def segmenter
+          @segmenter ||= Crosstest::Code2Doc::CodeSegmenter.new
+        end
 
         def find_segment_index(segments, matcher)
           segments.find_index do |s|

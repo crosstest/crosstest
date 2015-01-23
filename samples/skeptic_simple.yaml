@@ -1,0 +1,9 @@
+---
+  suites:
+    Katas:
+      samples:
+        - hello world
+        - quine
+    Environment:
+      samples:
+        - echo_color
