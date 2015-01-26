@@ -1,0 +1,181 @@
+require 'benchmark'
+require 'crosstest/code2doc/helpers/code_helper'
+
+# TODO: This class really needs to be split-up - and probably renamed.
+#
+# There's a few things happening here:
+#   There's the "Scenario" - probably better named "Scenario" - this
+#   is *what* we want to test, i.e. "Fog - Upload Directory". It should
+#   only rely on parsing crosstest.yaml.
+#
+#   Then there's the "Code Sample" - the code to be tested to verify the
+#   scenario. This can probably be moved to Psychic, since Psychic finds
+#   and executes the code samples.
+#
+#   And the result or "State File" - this stores and persists the test
+#   results and data captured by spies during test.
+#
+#   Finally, there's the driver, including the FSM class at the bottom of
+#   this file. It's responsible for managing the test lifecycle.
+
+module Crosstest
+  module Skeptic
+    class Scenario < Crosstest::Core::Dash # rubocop:disable ClassLength
+      include Skeptic::TestTransitions
+      include Skeptic::TestStatuses
+      include Crosstest::Core::FileSystem
+      include Crosstest::Core::Logging
+      include Crosstest::Core::Util::String
+      # View helpers
+      include Crosstest::Code2Doc::Helpers::CodeHelper
+
+      field :name, String
+      required_field :project, Crosstest::Project
+      required_field :suite, String, required: true
+      field :source_file, Pathname
+      field :basedir, Pathname
+      field :vars, Skeptic::TestManifest::Environment, default: {}
+
+      extend Forwardable
+      def_delegators :evidence, :save
+      KEYS_TO_PERSIST = [:last_attempted_action, :last_completed_action, :result,
+                         :spy_data, :error, :duration]
+      KEYS_TO_PERSIST.each do |key|
+        def_delegators :evidence, key.to_sym, "#{key}=".to_sym
+      end
+
+      def [](key)
+        return evidence[key] if KEYS_TO_PERSIST.include?(key.to_sym)
+        super
+      end
+
+      def []=(key, value)
+        return evidence[key] = value if KEYS_TO_PERSIST.include?(key.to_sym)
+        super
+      end
+
+      def initialize(hash)
+        evidence_hash = {}
+        KEYS_TO_PERSIST.each do |key|
+          evidence_hash[key] = hash.delete(key)
+        end
+        super
+        evidence(evidence_hash)
+        self.basedir ||= project.basedir
+      end
+
+      def runner
+        @runner ||= Crosstest::Psychic.new(cwd: basedir, logger: logger, env: environment_variables)
+      end
+
+      def environment_variables
+        global_vars = begin
+          Crosstest.manifest[:global_env].dup
+        rescue
+          {}
+        end
+        global_vars.merge(vars.dup)
+      end
+
+      def evidence(initial_data = {})
+        evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.yaml").expand_path
+        @evidence ||= Skeptic::Evidence.load(evidence_file, initial_data)
+      end
+
+      def validators
+        Crosstest::Skeptic::ValidatorRegistry.validators_for self
+      end
+
+      def logger
+        project.logger
+      end
+
+      def full_name
+        [suite, name].join ' :: '
+      end
+
+      def slug
+        slugify(suite, name, project.name)
+      end
+
+      def absolute_source_file
+        return nil if source_file.nil?
+
+        File.expand_path source_file, basedir
+      end
+
+      def detect!
+        fail FeatureNotImplementedError, "Project #{name} has not been cloned" unless project.cloned?
+        self.source_file = runner.find_sample(name)
+        fail FeatureNotImplementedError, name if source_file.nil?
+        fail FeatureNotImplementedError, name unless File.exist?(absolute_source_file)
+      rescue Errno::ENOENT
+        raise FeatureNotImplementedError, name
+      end
+
+      def exec!
+        detect!
+        evidence.result = run!
+      end
+
+      def run!(spies = Crosstest::Skeptic::Spies)
+        spies.observe(self) do
+          sample = runner.find_sample(source_file.to_s)
+          command = runner.command_for_sample(sample)
+          execution_result = runner.run_sample(source_file.to_s)
+          evidence.result = Skeptic::Result.new(execution_result: execution_result, source_file: source_file.to_s, command: command)
+        end
+        result
+      rescue Crosstest::Shell::ExecutionError => e
+        execution_error = ExecutionError.new(e)
+        execution_error.execution_result = e.execution_result
+        evidence.error = Crosstest::Error.formatted_trace(e).join("\n")
+        raise execution_error
+      end
+
+      def verify!
+        validators.each do |validator|
+          validation = validator.validate(self)
+          status = case validation.result
+                   when :passed
+                     Core::Color.colorize("\u2713 Passed", :green)
+                   when :failed
+                     Core::Color.colorize('x Failed', :red)
+                     Crosstest.handle_validation_failure(validation.error)
+                   else
+                     Core::Color.colorize(validation.result, :yellow)
+                   end
+          info format('%-50s %s', validator.description, status)
+        end
+      end
+
+      def destroy!
+        @evidence.destroy
+        @evidence = nil
+      end
+
+      def validations
+        return nil if result.nil?
+        result.validations
+      end
+
+      def log_failure(what, _e)
+        return if logger.logdev.nil?
+
+        logger.logdev.error(failure_message(what))
+        # TODO: Maybe this should be restored...
+        # Error.formatted_trace(e).each { |line| logger.logdev.error(line) }
+      end
+
+      # Returns a string explaining what action failed, at a high level. Used
+      # for displaying to end user.
+      #
+      # @param what [String] an action
+      # @return [String] a failure message
+      # @api private
+      def failure_message(what)
+        "#{what.capitalize} failed for test #{slug}."
+      end
+    end
+  end
+end

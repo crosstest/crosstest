@@ -133,7 +133,7 @@ module Crosstest
           rescue Crosstest::ActionFailed => e
             errors << e
             # logger.error(e.message) # Should already be logged
-          rescue => e # Crosstest::ExecutionError, Crosstest::ScenarioFailure
+          rescue => e # Crosstest::ExecutionError, Crosstest::Skeptic::ScenarioFailure
             test_env_num = t[:test_env_number]
             logger.warn("Thread for test_env_number: #{test_env_num} died because:")
             logger.error(Crosstest::Error.formatted_trace(e).join("\n"))
@@ -163,7 +163,7 @@ module Crosstest
           while (instance = @queue.pop)
             begin
               instance.public_send(action, *args)
-            rescue Crosstest::ExecutionError, Crosstest::ScenarioFailure => e
+            rescue Crosstest::ExecutionError, Crosstest::Skeptic::ScenarioFailure => e
               logger.error(e)
             rescue => e
               logger.warn('An unexpected error occurred')

@@ -127,8 +127,11 @@ module Crosstest
   # action.
   class ActionFailed < TransientFailure; end
 
-  # Exception class capturing what caused an scenario to die.
-  class ScenarioFailure < TransientFailure; end
+  # FIXME: Move to skeptic
+  module Skeptic
+    # Exception class capturing what caused an scenario to die.
+    class ScenarioFailure < TransientFailure; end
+  end
 
   # Exception class capturing what caused a validation to fail.
   class ValidationFailure < TransientFailure
@@ -179,7 +182,7 @@ module Crosstest
     # @raise [SystemExit] if an exception is raised in the yielded block
     def with_friendly_errors
       yield
-    rescue Crosstest::ScenarioFailure => e
+    rescue Crosstest::Skeptic::ScenarioFailure => e
       Crosstest.mutex.synchronize do
         handle_scenario_failure(e)
       end

@@ -80,7 +80,7 @@ module Crosstest
       rescue Errno::ENOENT
         scenario_data[:source_file] = nil
       end
-      Scenario.new scenario_data
+      Skeptic::Scenario.new scenario_data
     end
 
     def cloned?

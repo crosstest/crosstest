@@ -1,5 +1,8 @@
 module Crosstest
   module Skeptic
+    autoload :Scenario, 'crosstest/skeptic/scenario'
+    autoload :TestStatuses, 'crosstest/skeptic/test_statuses'
+    autoload :TestTransitions, 'crosstest/skeptic/test_transitions'
     autoload :TestManifest, 'crosstest/skeptic/test_manifest'
     autoload :Evidence, 'crosstest/skeptic/evidence'
     autoload :Result, 'crosstest/skeptic/result'

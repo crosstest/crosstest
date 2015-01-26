@@ -7,8 +7,6 @@ require 'crosstest/project'
 require 'crosstest/project_set'
 require 'crosstest/project_logger'
 require 'crosstest/error'
-require 'crosstest/scenario'
-require 'crosstest/scenarios'
 require 'crosstest/configuration'
 require 'crosstest/documentation_generator'
 
@@ -172,7 +170,7 @@ module Crosstest
     end
 
     # Registers a {Crosstest::Skeptic::Validator} that will be used during test
-    # execution on matching {Crosstest::Scenario}s.
+    # execution on matching {Crosstest::Skeptic::Scenario}s.
     def validate(desc, scope = { suite: //, scenario: // }, &block)
       fail ArgumentError 'You must pass block' unless block_given?
       validator = Crosstest::Skeptic::Validator.new(desc, scope, &block)

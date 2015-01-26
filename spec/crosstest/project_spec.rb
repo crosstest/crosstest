@@ -65,7 +65,7 @@ module Crosstest
       let(:scenario) { Fabricate(:scenario, name: 'factorial', vars: {}) }
 
       it 'builds a Scenario' do
-        expect(scenario).to be_an_instance_of Crosstest::Scenario
+        expect(scenario).to be_an_instance_of Crosstest::Skeptic::Scenario
       end
 
       it 'finds the source' do

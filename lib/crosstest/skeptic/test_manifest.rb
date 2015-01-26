@@ -50,7 +50,7 @@ module Crosstest
       attr_accessor :scenarios
 
       def scenarios
-        @scenarios ||= Scenarios.new
+        @scenarios ||= {}
       end
 
       def build_scenarios(projects)

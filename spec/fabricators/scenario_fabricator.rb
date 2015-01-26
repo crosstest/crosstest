@@ -1,6 +1,6 @@
 # Fabricates test manifests (.crosstest_tests.yaml files)
 
-Fabricator(:scenario, from: Crosstest::Scenario) do
+Fabricator(:scenario, from: Crosstest::Skeptic::Scenario) do
   initialize_with { @_klass.new to_hash } # Hash based initialization
   name { SCENARIO_NAMES.sample }
   suite { LANGUAGES.sample }
