@@ -149,6 +149,10 @@ module Crosstest
                       aliases: '-f',
                       desc: 'The Crosstest project set file',
                       default: 'crosstest.yaml'
+        method_option :skeptic,
+                      aliases: '-s',
+                      desc: 'The Skeptic test manifest file',
+                      default: 'skeptic.yaml'
         define_method(action) do |*args|
           update_config!
           action_options = options.dup

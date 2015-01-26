@@ -18,7 +18,7 @@ A lot of the crosstest implementation was influenced by [test-kitchen](http://ki
 Crosstest provides three main tools that work across projects:
 - crosstask: Run a task or workflow in every project, even if they each project uses different languages and tools
 - crosstest: Test code samples in each project against a common set of criteria
-- corssdoc: Convert annotated code samples to lightweight markup documentation
+- crossdoc: Convert annotated code samples to lightweight markup documentation
 
 ## Installing Crosstest
 
