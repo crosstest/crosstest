@@ -1,4 +1,6 @@
 require 'json'
+require 'tilt'
+require 'haml'
 require 'crosstest/reporters'
 
 module Crosstest
@@ -131,9 +133,13 @@ module Crosstest
         end
 
         def create_test_reports
+          template_file = find_in_source_paths("templates/_test_report.html.haml")
+          template = Tilt.new(template_file)
           Crosstest.manifest.scenarios.values.each do |scenario|
             @scenario = scenario
-            template 'templates/_test_report.html.tt', "details/#{scenario.slug}.html"
+            add_file "details/#{scenario.slug}.html" do
+              template.render(self)
+            end
           end
         end
       end

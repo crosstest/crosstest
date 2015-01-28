@@ -132,6 +132,11 @@ module Crosstest
         execution_error.execution_result = e.execution_result
         evidence.error = Crosstest::Error.formatted_trace(e).join("\n")
         raise execution_error
+      rescue => e
+        evidence.error = Crosstest::Error.formatted_trace(e).join("\n")
+        raise e
+      ensure
+        save
       end
 
       def verify!

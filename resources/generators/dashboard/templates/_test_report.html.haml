@@ -1,0 +1,91 @@
+!!!
+%html
+  %body
+    %meta{:charset => "UTF-8"}/
+    %link{"data-require" => "bootstrap-css@*", "data-semver" => "3.0.0", :href => "http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css", :rel => "stylesheet"}/
+    %link{:href => "../assets/pygments/#{options[:code_style]}.css", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "../assets/style.css", :rel => "stylesheet", :type => "text/css"}/
+    %link{:href => "../assets/angular/json-formatter.min.css", :rel => "stylesheet", :type => "text/css"}/
+    %script{"data-require" => "angular.js@*", "data-semver" => "1.2.27", :src => "../assets/angular/angular.min.js"}
+    %script{:src => "../assets/angular/ui-bootstrap-tpls.min.js"}
+    %script{:src => "../assets/angular/json-formatter.min.js"}
+    :javascript
+      angular.module('details', ['jsonFormatter', 'ui.bootstrap']);
+    %div{:class => "panel panel-#{bootstrap_color(@scenario.status_color)}"}
+      .panel-heading
+        .panel-title
+          %strong
+            = @scenario.slug
+            %span{:class => "label pull-right label-#{bootstrap_color(@scenario.status_color)}"}= @scenario.status_description
+      .panel-body
+        %ul.list-group
+          %li.list-group-item= status('Test suite:', @scenario.suite)
+          %li.list-group-item= status('Test scenario:', @scenario.name)
+          %li.list-group-item= status('Implementor:', @scenario.project.name)
+          %li.list-group-item= status('Duration:', Crosstest::Core::Util.duration(@scenario.duration))
+          %li.list-group-item
+            %strong.list-group-item-heading Test Input
+            - source_file = @scenario.absolute_source_file ? Crosstest::Core::FileSystem.relativize(@scenario.absolute_source_file, Dir.pwd) : '<No code sample>'
+            %ul.list-group-item
+              %strong.list-group-item-heading Code sample
+              %p.list-group-item-text
+                - if @scenario.absolute_source_file
+                  = @scenario.highlighted_code('html')
+            %ul.list-group-item
+              %strong.list-group-item-heading Test parameters
+              %tabset
+                %tab{:heading => "Tree"}
+                  %json-formatter{:json => as_json(@scenario.vars), :open => "5"}
+                %tab{:heading => "Raw"}
+                  %pre.list-group-item-text.console
+                    %code
+                      = highlight(@scenario.vars.to_hash.to_yaml, language: 'yaml', formatter: 'html')
+          - if @scenario.result
+            %li.list-group-item
+              %strong.list-group-item-heading Execution Results
+              %ul.list-group
+                `
+                %li.list-group-item
+                  %strong.list-group-item-heading Validation Results
+                  %ul.list-group
+                    - @scenario.result.validations.each do |description, result|
+                      %li{:class => "list-group-item #{result.result}"}
+                        %strong.list-group-item-heading= description
+                        - if result.error
+                          .list-group-item
+                            %strong.list-group-item-heading Error Message
+                            %pre.list-group-item-text.console
+                              = ansi2html(h result.error.to_s)
+                          .list-group-item
+                            %strong.list-group-item-heading Validator Source
+                            .list-group-item-text
+                              = highlight(result.error_source, language: 'ruby', formatter: 'html')
+                %li.list-group-item
+                  %strong.list-group-item-heading STDOUT
+                  %pre.list-group-item-text.console
+                    - if @scenario.result
+                      %code
+                        = ansi2html(@scenario.result.execution_result.stdout)
+                %li.list-group-item
+                  %strong.list-group-item-heading STDERR
+                  %pre.list-group-item-text.console
+                    - if @scenario.result
+                      %code
+                        = ansi2html(@scenario.result.execution_result.stderr)
+          - if @scenario.error
+            %li.list-group-item
+              %strong.list-group-item-heading Framework Errors
+              %pre.list-group-item-text.console
+                %code
+                  = @scenario.error
+          - if @scenario.spy_data
+            %li.list-group-item
+              %strong.list-group-item-heading Spy data
+              %tabset
+                %tab{:heading => "Tree"}
+                  %json-formatter{:json => as_json(@scenario.spy_data), :open => "5"}
+                %tab{:heading => "Raw"}
+                  %pre.list-group-item-text.console
+                    %code
+                      = highlight(@scenario.spy_data.to_hash.to_yaml, language: 'yaml', formatter: 'html')
+  = render :partial => 'meeting_info', :locals => { :info => @info }
