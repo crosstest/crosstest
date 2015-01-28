@@ -133,7 +133,7 @@ module Crosstest
         end
 
         def create_test_reports
-          template_file = find_in_source_paths("templates/_test_report.html.haml")
+          template_file = find_in_source_paths('templates/_test_report.html.haml')
           template = Tilt.new(template_file)
           Crosstest.manifest.scenarios.values.each do |scenario|
             @scenario = scenario
