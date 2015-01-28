@@ -79,7 +79,7 @@ module Crosstest
       end
 
       def evidence(initial_data = {})
-        evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.yaml").expand_path
+        evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.pstore").expand_path
         @evidence ||= Skeptic::Evidence.load(evidence_file, initial_data)
       end
 

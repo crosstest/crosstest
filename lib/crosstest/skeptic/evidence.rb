@@ -1,8 +1,10 @@
+require 'pstore'
+
 module Crosstest
   module Skeptic
     class EvidenceFileLoadError < StandardError; end
     class Evidence < Crosstest::Core::Dash
-      attr_reader :file_name
+      attr_reader :file
       attr_writer :autosave
 
       field :last_attempted_action, String
@@ -15,8 +17,9 @@ module Crosstest
 
       # KEYS_TO_PERSIST = [:result, :spy_data, :error, :vars, :duration]
 
-      def initialize(file_name, initial_data = {})
-        @file_name = file_name
+      def initialize(file, initial_data = {})
+        @file = Pathname(file)
+        FileUtils.mkdir_p(@file.dirname)
         super initial_data
       end
 
@@ -29,30 +32,36 @@ module Crosstest
         @autosave == true
       end
 
-      def self.load(file_name, initial_data)
-        if File.exist?(file_name)
-          existing_data = Crosstest::Core::Mash.load(file_name)
-          initial_data.merge!(existing_data)
+      def self.load(file, initial_data = {})
+        new(file, initial_data).tap(&:reload)
+      end
+
+      def reload
+        store.transaction do
+          store.roots.each do | key |
+            self[key] = store[key]
+          end
         end
-        Evidence.new(file_name, initial_data)
       end
 
       def save
-        dir = File.dirname(file_name)
-        serialized_string = serialize_hash(Core::Util.stringified_hash(to_hash))
-
-        FileUtils.mkdir_p(dir)
-        File.open(file_name, 'wb') { |f| f.write(serialized_string) }
+        store.transaction do
+          keys.each do | key |
+            store[key] = self[key]
+          end
+        end
       end
 
       def destroy
-        @data = nil
-        FileUtils.rm_f(file_name) if File.exist?(file_name)
+        @store = nil
+        file.delete
       end
 
       private
 
-      attr_reader :file_name
+      def store
+        @store ||= PStore.new(file)
+      end
 
       # @api private
       def serialize_hash(hash)
