@@ -4,6 +4,17 @@ SimpleCov.start
 require 'crosstest'
 require 'fabrication'
 require 'thor_spy'
+require 'aruba'
+require 'aruba/api'
+
+# Config required for project
+RSpec.configure do | config |
+  config.include Aruba::Api
+  config.before(:example) do
+    @aruba_timeout_seconds = 30
+    clean_current_dir
+  end
+end
 
 Crosstest.configure do |crosstest|
   Dir['sdks/*'].each do |sdk|
