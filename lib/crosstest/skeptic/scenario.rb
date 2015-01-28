@@ -32,6 +32,7 @@ module Crosstest
       field :name, String
       required_field :project, Crosstest::Project
       required_field :suite, String, required: true
+      field :code_sample, Psychic::Script
       field :source_file, Pathname
       field :basedir, Pathname
       field :vars, Skeptic::TestManifest::Environment, default: {}
@@ -105,8 +106,9 @@ module Crosstest
       end
 
       def detect!
-        fail FeatureNotImplementedError, "Project #{name} has not been cloned" unless project.cloned?
-        self.source_file = runner.find_sample(name)
+        fail FeatureNotImplementedError, "Project #{project.name} has not been cloned" unless project.cloned?
+        self.code_sample = runner.find_script(name)
+        self.source_file = Pathname(code_sample)
         fail FeatureNotImplementedError, name if source_file.nil?
         fail FeatureNotImplementedError, name unless File.exist?(absolute_source_file)
       rescue Errno::ENOENT
@@ -120,9 +122,8 @@ module Crosstest
 
       def run!(spies = Crosstest::Skeptic::Spies)
         spies.observe(self) do
-          sample = runner.find_sample(source_file.to_s)
-          command = runner.command_for_sample(sample)
-          execution_result = runner.run_sample(source_file.to_s)
+          command = runner.command_for_script(code_sample)
+          execution_result = runner.run_script(name)
           evidence.result = Skeptic::Result.new(execution_result: execution_result, source_file: source_file.to_s, command: command)
         end
         result

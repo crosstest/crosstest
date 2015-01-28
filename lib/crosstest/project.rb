@@ -51,23 +51,22 @@ module Crosstest
       end
     end
 
-    def task(task_name, custom_banner = nil)
-      if custom_banner
-        banner custom_banner
-      else
-        banner "Running task #{task_name} for #{name}"
-      end
+    def task(task_name, opts = { fail_if_missing: true })
+      banner_msg = opts[:custom_banner] || "Running task #{task_name} for #{name}"
+      banner banner_msg
       fail "Project #{name} has not been cloned" unless cloned?
       runner.execute_task(task_name)
     rescue Crosstest::Psychic::TaskNotImplementedError => e
-      logger.error("Could not run task #{task_name} for #{name}: #{e.message}")
-      raise ActionFailed.new("Failed to run task #{task_name} for #{name}: #{e.message}", e)
+      if opts[:fail_if_missing]
+        logger.error("Could not run task #{task_name} for #{name}: #{e.message}")
+        raise ActionFailed.new("Failed to run task #{task_name} for #{name}: #{e.message}", e)
+      else
+        logger.warn "Skipping #{task_name} for #{name}, no #{task_name} task exists"
+      end
     end
 
     def bootstrap
-      task('bootstrap', "Bootstrapping #{name}")
-    rescue Crosstest::Psychic::TaskNotImplementedError
-      logger.warn "Skipping bootstrapping for #{name}, no bootstrap task exists"
+      task('bootstrap', custom_banner: "Bootstrapping #{name}", fail_if_missing: false)
     end
 
     def build_scenario(scenario_data)

@@ -25,7 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'buff-shell_out', '~> 0.1'  # Used for JRuby
   spec.add_dependency 'middleware', '~> 0.1'
   spec.add_dependency 'rspec-expectations', '~> 3.0'
-  spec.add_dependency 'hashie', '~> 3.0'
   spec.add_dependency 'padrino-helpers', '~> 0.12'
   spec.add_dependency 'erubis', '~> 2.7'
   spec.add_development_dependency 'rspec', '~> 3.0'
