@@ -59,19 +59,5 @@ module Crosstest
         end
       end
     end
-
-    describe '#build_scenario' do
-      subject(:project) { Crosstest::Project.new name: 'some_project', basedir: File.absolute_path('spec/fixtures') }
-      let(:scenario) { Fabricate(:scenario, name: 'factorial', vars: {}) }
-
-      it 'builds a Scenario' do
-        expect(scenario).to be_an_instance_of Crosstest::Skeptic::Scenario
-      end
-
-      it 'finds the source' do
-        expected_file = Pathname.new 'spec/fixtures/factorial.py'
-        expect(scenario.source_file).to eq(expected_file)
-      end
-    end
   end
 end

@@ -47,19 +47,32 @@ module Crosstest
       field :global_env, Environment
       field :suites, Hash[String => Suite]
 
+      attr_accessor :scenario_definitions
       attr_accessor :scenarios
+
+      def scenario_definitions
+        @scenario_definitions ||= build_scenario_definitions
+      end
 
       def scenarios
         @scenarios ||= {}
       end
 
-      def build_scenarios(projects)
+      def build_scenario_definitions
+        definitions = Set.new
         suites.each do | suite_name, suite |
           suite.samples.each do | sample |
-            projects.each_value do | project |
-              scenario = project.build_scenario suite: suite_name, name: sample, vars: suite.env
-              scenarios[scenario.slug] = scenario
-            end
+            definitions << ScenarioDefinition.new(name: sample, suite: suite_name, vars: suite.env)
+          end
+        end
+        definitions
+      end
+
+      def build_scenarios(projects)
+        scenario_definitions.each do | scenario_definition |
+          projects.values.each do | project |
+            scenario = scenario_definition.build project
+            scenarios[scenario.slug] = scenario
           end
         end
       end

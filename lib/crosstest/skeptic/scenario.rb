@@ -21,6 +21,7 @@ require 'crosstest/code2doc/helpers/code_helper'
 module Crosstest
   module Skeptic
     class Scenario < Crosstest::Core::Dash # rubocop:disable ClassLength
+      extend Forwardable
       include Skeptic::TestTransitions
       include Skeptic::TestStatuses
       include Crosstest::Core::FileSystem
@@ -29,15 +30,17 @@ module Crosstest
       # View helpers
       include Crosstest::Code2Doc::Helpers::CodeHelper
 
-      field :name, String
+      field :scenario_definition, ScenarioDefinition
       required_field :project, Crosstest::Project
-      required_field :suite, String, required: true
+      field :vars, Skeptic::TestManifest::Environment, default: {}
       field :code_sample, Psychic::Script
       field :source_file, Pathname
-      field :basedir, Pathname
-      field :vars, Skeptic::TestManifest::Environment, default: {}
 
-      extend Forwardable
+      attr_reader :slug
+
+      def_delegators :scenario_definition, :name, :suite, :vars, :full_name
+      def_delegators :project, :basedir, :logger
+      # def_delegators :code_sample, :source_file, :absolute_source_file
       def_delegators :evidence, :save
       KEYS_TO_PERSIST = [:last_attempted_action, :last_completed_action, :result,
                          :spy_data, :error, :duration]
@@ -45,58 +48,22 @@ module Crosstest
         def_delegators :evidence, key.to_sym, "#{key}=".to_sym
       end
 
-      def [](key)
-        return evidence[key] if KEYS_TO_PERSIST.include?(key.to_sym)
+      def initialize(data)
         super
-      end
-
-      def []=(key, value)
-        return evidence[key] = value if KEYS_TO_PERSIST.include?(key.to_sym)
-        super
-      end
-
-      def initialize(hash)
-        evidence_hash = {}
-        KEYS_TO_PERSIST.each do |key|
-          evidence_hash[key] = hash.delete(key)
-        end
-        super
-        evidence(evidence_hash)
-        self.basedir ||= project.basedir
+        @slug = slugify(suite, name, project.name).freeze
+        @evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.pstore").expand_path.freeze
       end
 
       def runner
-        @runner ||= Crosstest::Psychic.new(cwd: basedir, logger: logger, env: environment_variables)
-      end
-
-      def environment_variables
-        global_vars = begin
-          Crosstest.manifest[:global_env].dup
-        rescue
-          {}
-        end
-        global_vars.merge(vars.dup)
+        @runner ||= Crosstest::Psychic.new(cwd: basedir.dup, logger: logger, env: vars)
       end
 
       def evidence(initial_data = {})
-        evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.pstore").expand_path
-        @evidence ||= Skeptic::Evidence.load(evidence_file, initial_data)
+        @evidence ||= Skeptic::Evidence.load(@evidence_file, initial_data)
       end
 
       def validators
         Crosstest::Skeptic::ValidatorRegistry.validators_for self
-      end
-
-      def logger
-        project.logger
-      end
-
-      def full_name
-        [suite, name].join ' :: '
-      end
-
-      def slug
-        slugify(suite, name, project.name)
       end
 
       def absolute_source_file
@@ -163,24 +130,6 @@ module Crosstest
       def validations
         return nil if result.nil?
         result.validations
-      end
-
-      def log_failure(what, _e)
-        return if logger.logdev.nil?
-
-        logger.logdev.error(failure_message(what))
-        # TODO: Maybe this should be restored...
-        # Error.formatted_trace(e).each { |line| logger.logdev.error(line) }
-      end
-
-      # Returns a string explaining what action failed, at a high level. Used
-      # for displaying to end user.
-      #
-      # @param what [String] an action
-      # @return [String] a failure message
-      # @api private
-      def failure_message(what)
-        "#{what.capitalize} failed for test #{slug}."
       end
     end
   end
