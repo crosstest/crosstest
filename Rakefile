@@ -6,7 +6,7 @@ require 'cucumber'
 require 'cucumber/rake/task'
 require 'rubocop/rake_task'
 
-task default: [:self, :spec, :features, :rubocop]
+task default: [:spec, :features, :self, :rubocop]
 
 RSpec::Core::RakeTask.new('spec') do |t|
   t.rspec_opts = '-f documentation'
