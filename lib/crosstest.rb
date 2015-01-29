@@ -6,7 +6,6 @@ require 'crosstest/code2doc'
 require 'crosstest/project'
 require 'crosstest/project_set'
 require 'crosstest/project_logger'
-require 'crosstest/error'
 require 'crosstest/configuration'
 require 'crosstest/documentation_generator'
 
@@ -18,6 +17,8 @@ module Crosstest
   SUPPORTED_EXTENSIONS = %w(py rb js)
 
   class << self
+    include Core::Configurable
+
     DEFAULT_PROJECT_SET_FILE = 'crosstest.yaml'
     DEFAULT_TEST_MANIFEST_FILE = 'skeptic.yaml'
 
@@ -30,10 +31,6 @@ module Crosstest
     attr_accessor :global_runner
 
     attr_accessor :wants_to_quit
-
-    def logger
-      @logger ||= Crosstest.default_file_logger
-    end
 
     def new_logger(project) # (test, project, index)
       name = project.name # instance_name(test, project)
@@ -60,21 +57,20 @@ module Crosstest
       end
     end
 
-    def setup(options, project_set_file = DEFAULT_PROJECT_SET_FILE, test_manifest_file = DEFAULT_TEST_MANIFEST_FILE)
+    def update_config!(options)
       trap_interrupt
-
-      # logger.debug "Loading project set file: #{project_set_file}"
+      project_set_file = options.file || DEFAULT_PROJECT_SET_FILE
+      skeptic_file = options.skeptic || DEFAULT_TEST_MANIFEST_FILE
       @basedir = File.dirname project_set_file
       Crosstest.configuration.project_set = project_set_file
+      Crosstest.configuration.manifest = skeptic_file
+      @test_dir = options.test_dir || File.expand_path('tests/crosstest/', @basedir)
+      @logger = Crosstest.default_file_logger
+    end
 
-      # logger.debug "Loading skeptic file: #{test_manifest_file}"
-      # @basedir = File.dirname test_manifest_file
-      Crosstest.configuration.manifest = test_manifest_file
-
+    def setup
       manifest.build_scenarios(configuration.project_set.projects)
-
-      test_dir = options[:test_dir] || File.expand_path('tests/crosstest/', Dir.pwd)
-      autoload_crosstest_files(test_dir) unless test_dir.nil? || !File.directory?(test_dir)
+      autoload_crosstest_files(@test_dir) unless @test_dir.nil? || !File.directory?(@test_dir)
       manifest
     end
 
@@ -108,12 +104,20 @@ module Crosstest
       end
     end
 
-    def filter_scenarios(regexp, options = {})
-      select_scenarios(regexp).tap do |scenarios|
+    def filter_scenarios(project_regexp, scenario_regexp, options = {})
+      selected_scenarios = select_scenarios(scenario_regexp).tap do |scenarios|
         scenarios.keep_if { |scenario| scenario.failed? == options[:failed] } unless options[:failed].nil?
         scenarios.keep_if { |scenario| scenario.skipped? == options[:skipped] } unless options[:skipped].nil?
         scenarios.keep_if { |scenario| scenario.sample? == options[:samples] } unless options[:samples].nil?
       end
+      if project_regexp != 'all'
+        selected_projects = filter_projects(project_regexp, options)
+        project_names = selected_projects.map(&:name)
+        selected_scenarios.keep_if do |s|
+          project_names.include? s.psychic.name
+        end
+      end
+      selected_scenarios
     end
 
     def filter_projects(regexp, _options = {})
@@ -139,20 +143,6 @@ module Crosstest
       logfile = File.expand_path(File.join('.crosstest', 'logs', 'crosstest.log'))
       ProjectLogger.new(stdout: $stdout, logdev: logfile, level: env_log)
     end
-
-    # Determine the default log level from an environment variable, if it is
-    # set.
-    #
-    # @return [Integer,nil] a log level or nil if not set
-    # @api private
-    def env_log
-      level = ENV['CROSSTEST_LOG'] && ENV['CROSSTEST_LOG'].downcase.to_sym
-      level = Util.to_logger_level(level) unless level.nil?
-      level
-    end
-
-    # Default log level verbosity
-    DEFAULT_LOG_LEVEL = :info
 
     def reset
       @configuration = nil
@@ -182,17 +172,6 @@ module Crosstest
     # @api private
     def global_runner
       @global_runner ||= Crosstest::Psychic.new(cwd: Crosstest.basedir, logger: logger)
-    end
-
-    # @see Crosstest::Configuration
-    def configuration
-      fail "configuration doesn't take a block, use configure" if block_given?
-      @configuration ||= Configuration.new
-    end
-
-    # @see Crosstest::Configuration
-    def configure
-      yield(configuration)
     end
 
     # Returns whether or not standard output is associated with a terminal

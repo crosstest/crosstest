@@ -19,6 +19,8 @@ module Crosstest
     field :language, String
     field :git, GitOptions
 
+    alias_method :cwd, :basedir
+
     attr_accessor :psychic
 
     def psychic

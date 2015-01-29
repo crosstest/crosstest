@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'logging', '~> 1.8'
   spec.add_dependency 'mixlib-shellout', '~> 1.3' # Used for MRI
   spec.add_dependency 'buff-shell_out', '~> 0.1'  # Used for JRuby
-  spec.add_dependency 'middleware', '~> 0.1'
   spec.add_dependency 'rspec-expectations', '~> 3.0'
   spec.add_dependency 'padrino-helpers', '~> 0.12'
   spec.add_dependency 'erubis', '~> 2.7'

@@ -55,7 +55,7 @@ module Crosstest
       attr_reader :action
 
       def setup
-        Crosstest.setup(options, @project_set_file, @skeptic_file)
+        Crosstest.setup
       end
 
       def project_set_file
@@ -90,13 +90,9 @@ module Crosstest
       # @return [Array<Instance>] an array of scenarios
       # @api private
       def parse_subcommand(project_regexp = 'all', scenario_regexp = 'all', options = {})
-        projects = select_projects(project_regexp, options)
-        project_names = projects.map(&:name)
-        scenarios = Crosstest.filter_scenarios(scenario_regexp, options)
+        scenarios = Crosstest.filter_scenarios(project_regexp, scenario_regexp, options)
         die "No scenarios for regex `#{scenario_regexp}', try running `crosstest list'" if scenarios.empty?
-        scenarios.keep_if do |s|
-          project_names.include? s.psychic.name
-        end
+        scenarios
       rescue RegexpError => e
         die 'Invalid Ruby regular expression, ' \
           'you may need to single quote the argument. ' \

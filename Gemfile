@@ -15,7 +15,7 @@ branch = begin
            'master'
          end
 
-%w(crosstest-core psychic).each do |lib|
+%w(crosstest-core psychic skeptic).each do |lib|
   library_path = File.expand_path("../../#{lib}", __FILE__)
   gem_name = lib.start_with?('crosstest') ? lib : "crosstest-#{lib}"
   if File.exist?(library_path) && !ENV['USE_GIT_REPOS']

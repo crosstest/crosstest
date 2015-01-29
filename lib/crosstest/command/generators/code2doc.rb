@@ -33,14 +33,14 @@ module Crosstest
 
         class_option :destination, default: 'docs/'
 
+        argument :project_regexp, default: 'all'
+        argument :scenario_regexp, default: 'all'
+
         def setup
-          # HACK: Need to make Command setup/parse_subcommand easily re-usable in Thor::Group actions
-          command_options = {
-            shell: shell
-          }.merge(options)
-          command = Crosstest::Command::Base.new(args, options, command_options)
-          command.send(:setup)
-          @scenarios = command.send(:parse_subcommand, args.shift, args.shift)
+          Crosstest.update_config!(options)
+          Crosstest.setup
+          @scenarios = Crosstest.filter_scenarios(project_regexp, scenario_regexp, options)
+          abort "No scenarios for regex `#{scenario_regexp}', try running `crosstest list'" if @scenarios.empty?
         end
 
         def set_destination_root

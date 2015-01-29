@@ -102,7 +102,8 @@ module Crosstest
         def setup
           @tabs = {}
           @tabs['Dashboard'] = 'dashboard.html'
-          Crosstest.setup(options)
+          Crosstest.update_config!(options)
+          Crosstest.setup
         end
 
         def create_spy_reports

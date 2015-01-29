@@ -39,11 +39,12 @@ module Crosstest
         class_option :samples, type: :boolean, desc: 'Only list tests that have sample code / do not have sample code'
 
         def setup
-          Crosstest.setup(options)
+          Crosstest.update_config!(options)
+          Crosstest.setup
         end
 
         def select_scenarios
-          @scenarios = Crosstest.filter_scenarios(regexp, options)
+          @scenarios = Crosstest.filter_scenarios('all', regexp, options)
         end
 
         def set_source_and_destination

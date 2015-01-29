@@ -75,6 +75,7 @@ module Crosstest
       #
       # @api private
       def update_config!
+        Crosstest.update_config!(@options)
       end
 
       # If auto_init option is active, invoke the init generator.
