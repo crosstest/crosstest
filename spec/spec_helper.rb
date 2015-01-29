@@ -16,12 +16,6 @@ RSpec.configure do | config |
   end
 end
 
-Crosstest.configure do |crosstest|
-  Dir['sdks/*'].each do |sdk|
-    crosstest.build_project sdk
-  end
-end
-
 RSpec.configure do |c|
   c.before(:each) do
     Crosstest.reset

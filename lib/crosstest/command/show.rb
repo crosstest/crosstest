@@ -23,7 +23,7 @@ module Crosstest
           indent do
             status('Test suite', scenario.suite)
             status('Test scenario', scenario.name)
-            status('Project', scenario.project.name)
+            status('Project', scenario.psychic.name)
             source_file = if scenario.absolute_source_file
                             Core::FileSystem.relativize(scenario.absolute_source_file, Dir.pwd)
                           else

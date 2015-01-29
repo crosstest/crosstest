@@ -107,7 +107,7 @@ module Crosstest
         transition_result
       end
 
-      def log_failure(what, _e)
+      def log_failure(what, e)
         return if logger.logdev.nil?
 
         logger.logdev.error(failure_message(what))

@@ -55,7 +55,7 @@ module Crosstest
       end
 
       def scenarios
-        @scenarios ||= {}
+        @scenarios ||= Set.new
       end
 
       def build_scenario_definitions
@@ -72,7 +72,7 @@ module Crosstest
         scenario_definitions.each do | scenario_definition |
           projects.values.each do | project |
             scenario = scenario_definition.build project
-            scenarios[scenario.slug] = scenario
+            scenarios << scenario
           end
         end
       end

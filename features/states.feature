@@ -9,10 +9,10 @@ Feature: States
     When I run `bundle exec crosstest list`
     Then the output should contain:
     """
-    Test ID                   Suite  Scenario     Project  Status
-    katas-hello_world-ruby    Katas  hello world  ruby     <Not Found>
-    katas-hello_world-java    Katas  hello world  java     <Not Found>
-    katas-hello_world-python  Katas  hello world  python   <Not Found>
+    Suite  Scenario     Project  Status
+    Katas  hello world  ruby     <Not Found>
+    Katas  hello world  java     <Not Found>
+    Katas  hello world  python   <Not Found>
     """
 
   @no-clobber
@@ -21,10 +21,10 @@ Feature: States
     When I run `bundle exec crosstest list`
     Then the output should contain:
     """
-    Test ID                   Suite  Scenario     Project  Status
-    katas-hello_world-ruby    Katas  hello world  ruby     <Not Found>
-    katas-hello_world-java    Katas  hello world  java     <Not Found>
-    katas-hello_world-python  Katas  hello world  python   Executed
+    Suite  Scenario     Project  Status
+    Katas  hello world  ruby     <Not Found>
+    Katas  hello world  java     <Not Found>
+    Katas  hello world  python   Executed
     """
 
   @no-clobber
@@ -33,8 +33,8 @@ Feature: States
     When I run `bundle exec crosstest list`
     Then the output should contain:
     """
-    Test ID                   Suite  Scenario     Project  Status
-    katas-hello_world-ruby    Katas  hello world  ruby     Fully Verified (1 of 1)
-    katas-hello_world-java    Katas  hello world  java     <Not Found>
-    katas-hello_world-python  Katas  hello world  python   Executed
+    Suite  Scenario     Project  Status
+    Katas  hello world  ruby     Fully Verified (1 of 1)
+    Katas  hello world  java     <Not Found>
+    Katas  hello world  python   Executed
     """

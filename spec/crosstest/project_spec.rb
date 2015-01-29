@@ -4,12 +4,12 @@ module Crosstest
   describe Project do
     subject(:project) { described_class.new(name: 'test', language: 'ruby', basedir: expected_project_dir) }
     let(:expected_project_dir) { 'samples/sdks/foo' }
-    let(:runner) { double('runner') }
-    let(:global_runner) { double('global runner') }
+    let(:psychic) { double('psychic') }
+    let(:global_runner) { double('global psychic') }
     let(:expected_project_path) { Pathname.new(expected_project_dir) }
 
     before do
-      subject.runner = runner
+      subject.psychic = psychic
       Crosstest.global_runner = global_runner
     end
 
@@ -18,14 +18,14 @@ module Crosstest
       let(:expected_project_dir) { 'samples/sdks/ruby' }
 
       it 'executes script/bootstrap' do
-        expect(runner).to receive(:execute_task).with('bootstrap')
+        expect(psychic).to receive(:execute_task).with('bootstrap')
         project.bootstrap
       end
     end
 
     describe '#clone' do
       it 'does nothing if there is no clone option' do
-        expect(runner).to_not receive(:execute)
+        expect(psychic).to_not receive(:execute)
         project.clone
 
         project.clone

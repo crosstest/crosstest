@@ -24,7 +24,9 @@ module Crosstest
 
         it 'builds a Scenario for the Project' do
           expect(scenario).to be_an_instance_of Scenario
-          expect(scenario.project).to eq(project)
+          # It actually creates a Psychic for the project
+          expect(scenario.psychic.name).to eq(project.name)
+          expect(scenario.psychic.basedir.to_s).to eq(project.basedir.to_s)
         end
 
         xit 'finds the source' do

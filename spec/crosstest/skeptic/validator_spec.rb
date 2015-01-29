@@ -24,7 +24,7 @@ module Crosstest
 
       describe '#should_validate?' do
         let(:scenario) do
-          Fabricate(:scenario, suite: 'java', name: 'hello world')
+          Fabricate(:scenario_definition, suite: 'java', name: 'hello world')
         end
 
         it 'returns true if the scope matches the scope of the scenario' do
@@ -41,7 +41,12 @@ module Crosstest
       end
 
       describe '#validate' do
-        let(:scenario) { Fabricate(:scenario, result: Result.new) }
+        let(:project) { Fabricate(:project) }
+        let(:scenario) do
+          Fabricate(:scenario_definition).build(project).tap do | scenario |
+            scenario.result = Result.new
+          end
+        end
 
         it 'calls the validation callback' do
           called = false

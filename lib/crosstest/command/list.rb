@@ -20,7 +20,6 @@ module Crosstest
 
       def header_row
         row = []
-        row << colorize('Test ID', :green)
         row << colorize('Suite', :green)
         row << colorize('Scenario', :green)
         row << colorize('Project', :green)
@@ -31,10 +30,9 @@ module Crosstest
 
       def row(scenario)
         row = []
-        row << color_pad(scenario.slug)
         row << color_pad(scenario.suite)
         row << color_pad(scenario.name)
-        row << color_pad(scenario.project.name)
+        row << color_pad(scenario.psychic.name)
         row << format_status(scenario)
         if options[:source]
           source_file = scenario.absolute_source_file ? relativize(scenario.absolute_source_file, Dir.pwd) : colorize('<No code sample>', :red)

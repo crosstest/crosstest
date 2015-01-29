@@ -19,10 +19,10 @@ module Crosstest
     field :language, String
     field :git, GitOptions
 
-    attr_accessor :runner
+    attr_accessor :psychic
 
-    def runner
-      @runner ||= Crosstest::Psychic.new(cwd: basedir, logger: logger)
+    def psychic
+      @psychic ||= Crosstest::Psychic.new(cwd: basedir, logger: logger)
     end
 
     def logger
@@ -50,7 +50,7 @@ module Crosstest
       banner_msg = opts[:custom_banner] || "Running task #{task_name} for #{name}"
       banner banner_msg
       fail "Project #{name} has not been cloned" unless cloned?
-      runner.execute_task(task_name)
+      psychic.execute_task(task_name)
     rescue Crosstest::Psychic::TaskNotImplementedError => e
       if opts[:fail_if_missing]
         logger.error("Could not run task #{task_name} for #{name}: #{e.message}")

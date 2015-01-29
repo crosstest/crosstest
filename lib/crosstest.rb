@@ -93,7 +93,7 @@ module Crosstest
 
     def select_scenarios(regexp)
       regexp ||= 'all'
-      scenarios = manifest.scenarios.values
+      scenarios = manifest.scenarios
       if regexp == 'all'
         return scenarios
       else

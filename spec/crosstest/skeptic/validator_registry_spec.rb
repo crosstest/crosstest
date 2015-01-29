@@ -31,7 +31,7 @@ module Crosstest
         end
 
         it 'returns registered validators that match the scope of the scenario' do
-          scenario = Fabricate(:scenario, suite: 'java', name: 'hello world')
+          scenario = Fabricate(:scenario_definition, suite: 'java', name: 'hello world')
           validators = registry.validators_for scenario
           expect(validators).to include(java_hello_world_validator, java_validator)
           expect(validators).to_not include(ruby_validator)

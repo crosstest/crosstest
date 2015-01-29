@@ -31,15 +31,13 @@ module Crosstest
       include Crosstest::Code2Doc::Helpers::CodeHelper
 
       field :scenario_definition, ScenarioDefinition
-      required_field :project, Crosstest::Project
+      required_field :psychic, Crosstest::Psychic
       field :vars, Skeptic::TestManifest::Environment, default: {}
       field :code_sample, Psychic::Script
       field :source_file, Pathname
 
-      attr_reader :slug
-
       def_delegators :scenario_definition, :name, :suite, :vars, :full_name
-      def_delegators :project, :basedir, :logger
+      def_delegators :psychic, :basedir, :logger
       # def_delegators :code_sample, :source_file, :absolute_source_file
       def_delegators :evidence, :save
       KEYS_TO_PERSIST = [:last_attempted_action, :last_completed_action, :result,
@@ -48,14 +46,12 @@ module Crosstest
         def_delegators :evidence, key.to_sym, "#{key}=".to_sym
       end
 
+      attr_reader :slug
+
       def initialize(data)
         super
-        @slug = slugify(suite, name, project.name).freeze
-        @evidence_file = Pathname.new(Dir.pwd).join('.crosstest', "#{slug}.pstore").expand_path.freeze
-      end
-
-      def runner
-        @runner ||= Crosstest::Psychic.new(cwd: basedir.dup, logger: logger, env: vars)
+        @slug = slugify(suite, name, psychic.name)
+        @evidence_file = Pathname.new(Crosstest.basedir).join('.crosstest', "#{slug}.pstore").expand_path.freeze
       end
 
       def evidence(initial_data = {})
@@ -73,8 +69,8 @@ module Crosstest
       end
 
       def detect!
-        fail FeatureNotImplementedError, "Project #{project.name} has not been cloned" unless project.cloned?
-        self.code_sample = runner.find_script(name)
+        # fail FeatureNotImplementedError, "Project #{psychic.name} has not been cloned" unless psychic.cloned?
+        self.code_sample = psychic.find_script(name)
         self.source_file = Pathname(code_sample)
         fail FeatureNotImplementedError, name if source_file.nil?
         fail FeatureNotImplementedError, name unless File.exist?(absolute_source_file)
@@ -89,8 +85,8 @@ module Crosstest
 
       def run!(spies = Crosstest::Skeptic::Spies)
         spies.observe(self) do
-          command = runner.command_for_script(code_sample)
-          execution_result = runner.run_script(name)
+          command = psychic.command_for_script(code_sample)
+          execution_result = psychic.run_script(name)
           evidence.result = Skeptic::Result.new(execution_result: execution_result, source_file: source_file.to_s, command: command)
         end
         result

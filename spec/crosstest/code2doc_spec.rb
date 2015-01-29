@@ -39,7 +39,7 @@ module Crosstest
       before(:each) do
         allow(Crosstest).to receive(:scenario).with(scenario_name).and_return(scenario)
         scenario.test
-        Crosstest.manifest.scenarios[scenario.slug] = scenario
+        Crosstest.manifest.scenarios << scenario
       end
 
       it 'returns the output from the scenario' do

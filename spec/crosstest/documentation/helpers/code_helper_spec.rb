@@ -2,7 +2,12 @@ module Crosstest
   module Code2Doc
     module Helpers
       describe CodeHelper do
-        let(:scenario) { Fabricate(:scenario, name: 'test', source_file: @source_file) }
+        let(:project) { Fabricate(:project) }
+        let(:scenario) do
+          Fabricate(:scenario_definition, name: @source_file).build(project).tap do | scenario |
+            scenario.source_file = @source_file
+          end
+        end
         let(:source) do
           %q(
             # This snippet should not be in the output.
@@ -95,7 +100,8 @@ module Crosstest
 
         def generate_doc_for(template_file, source_file)
           doc_gen = DocumentationGenerator.new(template_file, 'testing')
-          scenario = Fabricate(:scenario, name: 'test', source_file: source_file)
+          scenario = Fabricate(:scenario_definition, name: 'test').build(project)
+          scenario.source_file = source_file
           doc_gen.process(scenario)
         end
 

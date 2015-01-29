@@ -91,10 +91,11 @@ module Crosstest
       # @api private
       def parse_subcommand(project_regexp = 'all', scenario_regexp = 'all', options = {})
         projects = select_projects(project_regexp, options)
+        project_names = projects.map(&:name)
         scenarios = Crosstest.filter_scenarios(scenario_regexp, options)
         die "No scenarios for regex `#{scenario_regexp}', try running `crosstest list'" if scenarios.empty?
         scenarios.keep_if do |s|
-          projects.include? s.project
+          project_names.include? s.psychic.name
         end
       rescue RegexpError => e
         die 'Invalid Ruby regular expression, ' \
