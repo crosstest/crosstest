@@ -1,5 +1,7 @@
 module Crosstest
   module Skeptic
+    autoload :ScenarioDefinition, 'crosstest/skeptic/scenario_definition'
+    autoload :PropertyDefinition, 'crosstest/skeptic/property_definition'
     autoload :Scenario, 'crosstest/skeptic/scenario'
     autoload :TestStatuses, 'crosstest/skeptic/test_statuses'
     autoload :TestTransitions, 'crosstest/skeptic/test_transitions'
