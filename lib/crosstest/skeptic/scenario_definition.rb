@@ -4,20 +4,35 @@ module Crosstest
       required_field :name, String
       required_field :suite, String, required: true
       field :properties, Hash[String => PropertyDefinition]
+      # TODO: Vars will be replaced by properties
+      field :vars, Skeptic::TestManifest::Environment, default: {}
+      attr_reader :full_name
+
+      def initialize(data)
+        super
+        @full_name = [suite, name].join(' :: ').freeze
+      end
 
       def build(project)
-        scenario_data = to_hash.dup
-        scenario_data.delete(:properties)
-        scenario_data[:basedir] ||= project.basedir
-        scenario_data[:project] ||= project
-        scenario_data[:suite] ||= ''
-        begin
-          scenario_data[:source_file] ||= Core::FileSystem.find_file project.basedir, scenario_data[:name]
-          scenario_data[:source_file] = Core::FileSystem.relativize(scenario_data[:source_file], scenario_data[:basedir])
+        source_file = begin
+          file = Core::FileSystem.find_file project.basedir, name
+          Core::FileSystem.relativize(file, project.basedir)
         rescue Errno::ENOENT
-          scenario_data[:source_file] = nil
+          nil
         end
-        Scenario.new(scenario_data)
+        Scenario.new(project: project, scenario_definition: self, vars: build_vars, source_file: source_file)
+      end
+
+      private
+
+      def build_vars
+        # TODO: Build vars from properties
+        global_vars = begin
+          Crosstest.manifest[:global_env].dup
+        rescue
+          {}
+        end
+        global_vars.merge(vars.dup)
       end
     end
   end

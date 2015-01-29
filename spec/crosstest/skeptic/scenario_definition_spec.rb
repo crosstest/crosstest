@@ -20,8 +20,16 @@ module Crosstest
       subject { described_class.new(definition) }
 
       describe '#build' do
-        it 'builds a scenario for a project' do
-          expect(subject.build project).to be_an_instance_of Scenario
+        let(:scenario) { subject.build project }
+
+        it 'builds a Scenario for the Project' do
+          expect(scenario).to be_an_instance_of Scenario
+          expect(scenario.project).to eq(project)
+        end
+
+        xit 'finds the source' do
+          expected_file = Pathname.new 'spec/fixtures/factorial.py'
+          expect(scenario.source_file).to eq(expected_file)
         end
       end
     end

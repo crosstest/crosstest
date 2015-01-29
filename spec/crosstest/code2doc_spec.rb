@@ -30,7 +30,7 @@ module Crosstest
     describe '.file_snippet' do
       let(:scenario) do
         project = Crosstest::Project.new name: 'some_sdk', basedir: 'spec/fixtures'
-        scenario = project.build_scenario name: 'factorial', vars: {}
+        scenario = Fabricate(:scenario_definition, name: 'factorial', vars: {}).build(project)
         scenario.test
         scenario
       end

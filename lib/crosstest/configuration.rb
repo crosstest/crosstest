@@ -60,7 +60,7 @@ module Crosstest
     # checks that the sample code runs successfully.
     def default_validator_callback
       @default_validator_callback ||= proc do |scenario|
-        expect(scenario[:result].execution_result.exitstatus).to eq(0)
+        expect(scenario.result.execution_result.exitstatus).to eq(0)
       end
     end
 

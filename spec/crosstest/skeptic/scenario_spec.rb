@@ -3,7 +3,7 @@ module Crosstest
     describe Scenario do
       subject(:scenario) do
         project = Crosstest::Project.new name: 'some_sdk', basedir: 'spec/fixtures'
-        project.build_scenario name: 'factorial', vars: {}
+        Fabricate(:scenario_definition, name: 'factorial', vars: {}).build(project)
       end
 
       describe '#exec' do
@@ -14,7 +14,7 @@ module Crosstest
 
         it 'stores the result' do
           evidence = scenario.exec
-          result = evidence[:result]
+          result = evidence.result
           expect(result).to be_an_instance_of Skeptic::Result
         end
       end

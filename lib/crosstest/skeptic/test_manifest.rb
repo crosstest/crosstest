@@ -62,7 +62,7 @@ module Crosstest
         definitions = Set.new
         suites.each do | suite_name, suite |
           suite.samples.each do | sample |
-            definitions << ScenarioDefinition.new(name: sample, suite: suite_name)
+            definitions << ScenarioDefinition.new(name: sample, suite: suite_name, vars: suite.env)
           end
         end
         definitions

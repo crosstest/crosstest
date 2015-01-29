@@ -107,6 +107,23 @@ module Crosstest
         transition_result
       end
 
+      def log_failure(what, _e)
+        return if logger.logdev.nil?
+
+        logger.logdev.error(failure_message(what))
+        Error.formatted_trace(e).each { |line| logger.logdev.error(line) }
+      end
+
+      # Returns a string explaining what action failed, at a high level. Used
+      # for displaying to end user.
+      #
+      # @param what [String] an action
+      # @return [String] a failure message
+      # @api private
+      def failure_message(what)
+        "#{what.capitalize} failed for test #{slug}."
+      end
+
       # The simplest finite state machine pseudo-implementation needed to manage
       # an Instance.
       #

@@ -6,8 +6,8 @@ module Crosstest
       describe '#register' do
         it 'registers a validator' do
           callback = proc do |scenario|
-            expect(scenario[:result]).to_not be_nil
-            expect(scenario[:result].execution_result.exitstatus).to eq(0)
+            expect(scenario.result).to_not be_nil
+            expect(scenario.result.execution_result.exitstatus).to eq(0)
           end
 
           expect(registry.validators).to be_empty
