@@ -52,7 +52,7 @@ module Crosstest
       banner_msg = opts[:custom_banner] || "Running task #{task_name} for #{name}"
       banner banner_msg
       fail "Project #{name} has not been cloned" unless cloned?
-      psychic.execute_task(task_name)
+      psychic.task(task_name).execute
     rescue Crosstest::Psychic::TaskNotImplementedError => e
       if opts[:fail_if_missing]
         logger.error("Could not run task #{task_name} for #{name}: #{e.message}")

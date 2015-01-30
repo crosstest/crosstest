@@ -18,7 +18,9 @@ module Crosstest
       let(:expected_project_dir) { 'samples/sdks/ruby' }
 
       it 'executes script/bootstrap' do
-        expect(psychic).to receive(:execute_task).with('bootstrap')
+        task = double('task')
+        expect(task).to receive(:execute)
+        expect(psychic).to receive(:task).with('bootstrap').and_return(task)
         project.bootstrap
       end
     end
