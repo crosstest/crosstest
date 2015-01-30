@@ -100,8 +100,19 @@ module Crosstest
       end
     end
 
+    require 'celluloid'
     # Common module to execute a Crosstest action such as create, converge, etc.
     module RunAction
+      class Worker
+        include Celluloid
+
+        def work(item, action, test_env_number, *args)
+          # Probably even better to store it on the item...
+          Thread.current[:test_env_number] = test_env_number
+          item.public_send(action, *args)
+        end
+      end
+
       # Run an action on each member of the collection. The collection could
       # be Projects (e.g. clone, bootstrap) or Scenarios (e.g. test, clean).
       # The instance actions will take place in a seperate thread of execution
@@ -116,59 +127,16 @@ module Crosstest
           concurrency = collection.size if concurrency > collection.size
         end
 
-        collection.each { |i| @queue << i }
-        concurrency.times { @queue << nil }
-
-        errors = []
-
-        threads = concurrency.times.map { |i| spawn(i) }
-        threads.map do |t|
-          begin
-            t.join
-          rescue Interrupt
-            raise
-          rescue Crosstest::ActionFailed => e
-            errors << e
-            # logger.error(e.message) # Should already be logged
-          rescue => e # Crosstest::ExecutionError, Crosstest::Skeptic::ScenarioFailure
-            test_env_num = t[:test_env_number]
-            logger.warn("Thread for test_env_number: #{test_env_num} died because:")
-            logger.error(Crosstest::Error.formatted_trace(e).join("\n"))
-            logger.warn('Spawning a replacement...')
-            # respawn thread
-            t.kill
-            threads.delete(t)
-            threads.push(spawn(test_env_num))
-          end
-        end while threads.any?(&:alive?)
-
-        unless errors.empty?
-          logger.error
-          logger.error('Error summary:')
-          errors.each do | error |
-            logger.error(error)
-          end
-          exit 1
+        if concurrency > 1
+          Celluloid::Actor[:crosstest_worker] = Worker.pool(size: concurrency)
+        else
+          Worker.supervise_as :crosstest_worker
         end
-      end
 
-      private
-
-      def spawn(i)
-        Thread.new(i) do |test_env_number|
-          Thread.current[:test_env_number] = test_env_number
-          while (instance = @queue.pop)
-            begin
-              instance.public_send(action, *args)
-            rescue Crosstest::ExecutionError, Crosstest::Skeptic::ScenarioFailure => e
-              logger.error(e)
-            rescue => e
-              logger.warn('An unexpected error occurred')
-              logger.error(e)
-              raise
-            end
-          end
+        futures = collection.each_with_index.map do |item, index|
+          Celluloid::Actor[:crosstest_worker].future.work(item, action, index, *args)
         end
+        futures.map(&:value)
       end
     end
   end

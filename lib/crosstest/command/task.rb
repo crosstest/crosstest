@@ -15,6 +15,7 @@ module Crosstest
           projects = Crosstest.filter_projects(project_regex)
           run_action(projects, task)
         end
+        #  Need task summary...
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end
     end
