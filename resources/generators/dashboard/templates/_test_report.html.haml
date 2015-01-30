@@ -21,7 +21,7 @@
         %ul.list-group
           %li.list-group-item= status('Test suite:', @scenario.suite)
           %li.list-group-item= status('Test scenario:', @scenario.name)
-          %li.list-group-item= status('Implementor:', @scenario.project.name)
+          %li.list-group-item= status('Implementor:', @scenario.psychic.name)
           %li.list-group-item= status('Duration:', Crosstest::Core::Util.duration(@scenario.duration))
           %li.list-group-item
             %strong.list-group-item-heading Test Input
