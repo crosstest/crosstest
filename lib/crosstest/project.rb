@@ -15,7 +15,7 @@ module Crosstest
     end
 
     field :name, String
-    field :basedir, Pathname, required: true
+    field :basedir, Pathname
     field :language, String
     field :git, GitOptions
 
@@ -24,7 +24,11 @@ module Crosstest
     attr_accessor :psychic
 
     def psychic
-      @psychic ||= Crosstest::Psychic.new(cwd: basedir, logger: logger)
+      @psychic ||= Crosstest::Psychic.new(name: name, cwd: basedir, logger: logger)
+    end
+
+    def basedir
+      self[:basedir] ||= "projects/#{name}"
     end
 
     def logger
@@ -44,7 +48,7 @@ module Crosstest
       else
         clone_cmd = "git clone #{git.repo} -b #{branch} #{target_dir}"
         logger.info "Cloning: #{clone_cmd}"
-        Crosstest.global_runner.execute(clone_cmd)
+        Crosstest.psychic.execute(clone_cmd)
       end
     end
 

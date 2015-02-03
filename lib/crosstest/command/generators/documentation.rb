@@ -43,10 +43,6 @@ module Crosstest
           Crosstest.setup
         end
 
-        def select_scenarios
-          @scenarios = Crosstest.filter_scenarios('all', regexp, options)
-        end
-
         def set_source_and_destination
           unless options[:template] || File.exist?(options[:source])
             abort 'Either the --source directory must exist, or --template must be specified'

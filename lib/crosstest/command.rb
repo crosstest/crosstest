@@ -107,9 +107,12 @@ module Crosstest
         include Celluloid
 
         def work(item, action, test_env_number, *args)
-          # Probably even better to store it on the item...
-          Thread.current[:test_env_number] = test_env_number
+          item.vars['TEST_ENV_NUMBER'] = test_env_number if item.respond_to? :vars
           item.public_send(action, *args)
+        rescue Crosstest::TransientFailure
+          # Celluloid supervisor should be restarting actors after errors, but
+          # it seems to die, so stop the error from propagating...
+          nil
         end
       end
 
@@ -134,9 +137,9 @@ module Crosstest
         end
 
         futures = collection.each_with_index.map do |item, index|
-          Celluloid::Actor[:crosstest_worker].future.work(item, action, index, *args)
+          actor = Celluloid::Actor[:crosstest_worker]
+          actor.work(item, action, index, *args)
         end
-        futures.map(&:value)
       end
     end
   end

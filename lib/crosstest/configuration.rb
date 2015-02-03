@@ -7,7 +7,6 @@ module Crosstest
 
   class Configuration < Crosstest::Core::Dash
     extend Forwardable
-    def_delegators :skeptic, :manifest, :manifest=
     field :dry_run, Object, default: false
     field :log_root, Pathname, default: '.crosstest/logs'
     field :log_level, Symbol, default: :info
@@ -24,7 +23,7 @@ module Crosstest
     end
 
     def default_logger
-      @default_logger ||= ProjectLogger.new(stdout: $stdout, level: env_log)
+      @default_logger ||= ProjectLogger.new(stdout: $stdout, level: Core::Util.to_logger_level(log_level))
     end
 
     def project_set
@@ -42,19 +41,11 @@ module Crosstest
       raise UserError, "Could not load test manifest: #{e.message}"
     end
 
-    alias_method :load_project_set, :project_set=
-
-    private
-
-    # Determine the default log level from an environment variable, if it is
-    # set.
-    #
-    # @return [Integer,nil] a log level or nil if not set
-    # @api private
-    def env_log
-      level = ENV['CROSSTEST_LOG'] && ENV['CROSSTEST_LOG'].downcase.to_sym
-      level = Crosstest::Core::Util.to_logger_level(level) unless level.nil?
-      level
+    def clear
+      skeptic.clear
+      super
     end
+
+    alias_method :load_project_set, :project_set=
   end
 end

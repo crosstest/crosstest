@@ -27,13 +27,14 @@ module Crosstest
         failed_scenarios = scenarios.select do | s |
           !s.status_description.match(/Fully Verified|<Not Found>/)
         end
-        return if failed_scenarios.empty?
 
         shell.say
         failed_scenarios.each do | scenario |
           shell.say_status scenario.status_description, scenario.slug
         end
-        abort "#{failed_scenarios.count} tests failed"
+        status_line = "#{scenarios.size} scenarios, #{failed_scenarios.size} failures" # , x pending
+        shell.say status_line
+        abort unless failed_scenarios.empty?
       end
     end
   end

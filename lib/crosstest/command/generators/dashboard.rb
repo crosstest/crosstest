@@ -23,9 +23,8 @@ module Crosstest
           end
 
           def results
-            manifest = Crosstest.manifest
             rows = []
-            grouped_scenarios = manifest.scenarios.group_by { |scenario| [scenario.suite, scenario.name] }
+            grouped_scenarios = Crosstest.scenarios.group_by { |scenario| [scenario.suite, scenario.name] }
             grouped_scenarios.each do |(suite, name), scenarios|
               row = {
                 slug_prefix: slugify(suite, name),
@@ -136,7 +135,7 @@ module Crosstest
         def create_test_reports
           template_file = find_in_source_paths('templates/_test_report.html.haml')
           template = Tilt.new(template_file)
-          Crosstest.manifest.scenarios.each do |scenario|
+          Crosstest.scenarios.each do |scenario|
             @scenario = scenario
             add_file "details/#{scenario.slug}.html" do
               template.render(self)

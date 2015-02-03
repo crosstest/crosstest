@@ -5,12 +5,12 @@ module Crosstest
     subject(:project) { described_class.new(name: 'test', language: 'ruby', basedir: expected_project_dir) }
     let(:expected_project_dir) { 'samples/sdks/foo' }
     let(:psychic) { double('psychic') }
-    let(:global_runner) { double('global psychic') }
+    let(:psychic) { double('global psychic', basedir: current_dir) }
     let(:expected_project_path) { Pathname.new(expected_project_dir) }
 
     before do
       subject.psychic = psychic
-      Crosstest.global_runner = global_runner
+      Crosstest.psychic = psychic
     end
 
     describe '#bootstrap' do
@@ -36,7 +36,7 @@ module Crosstest
       context 'with git as a simple string' do
         it 'clones the repo specified by the string' do
           project.git = 'git@github.com/foo/bar'
-          expect(global_runner).to receive(:execute).with("git clone git@github.com/foo/bar -b master #{expected_project_path}")
+          expect(psychic).to receive(:execute).with("git clone git@github.com/foo/bar -b master #{expected_project_path}")
           project.clone
         end
       end
@@ -44,19 +44,19 @@ module Crosstest
       context 'with git as a hash' do
         it 'clones the repo specified by the repo parameter' do
           project.git = { repo: 'git@github.com/foo/bar' }
-          expect(global_runner).to receive(:execute).with("git clone git@github.com/foo/bar -b master #{expected_project_path}")
+          expect(psychic).to receive(:execute).with("git clone git@github.com/foo/bar -b master #{expected_project_path}")
           project.clone
         end
 
         it 'clones the repo on the branch specified by the brach parameter' do
           project.git = { repo: 'git@github.com/foo/bar', branch: 'quuz' }
-          expect(global_runner).to receive(:execute).with("git clone git@github.com/foo/bar -b quuz #{expected_project_path}")
+          expect(psychic).to receive(:execute).with("git clone git@github.com/foo/bar -b quuz #{expected_project_path}")
           project.clone
         end
 
         it 'clones the repo to the location specified by the to parameter' do
           project.git = { repo: 'git@github.com/foo/bar', to: 'sdks/foo' }
-          expect(global_runner).to receive(:execute).with('git clone git@github.com/foo/bar -b master sdks/foo')
+          expect(psychic).to receive(:execute).with('git clone git@github.com/foo/bar -b master sdks/foo')
           project.clone
         end
       end

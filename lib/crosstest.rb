@@ -28,7 +28,7 @@ module Crosstest
     # @return [Logger] the common Crosstest logger
     attr_accessor :logger
 
-    attr_accessor :global_runner
+    attr_accessor :psychic
 
     attr_accessor :wants_to_quit
 
@@ -45,7 +45,7 @@ module Crosstest
     end
 
     def basedir
-      @basedir ||= Dir.pwd
+      @basedir ||= psychic.basedir
     end
 
     # @private
@@ -59,18 +59,24 @@ module Crosstest
 
     def update_config!(options)
       trap_interrupt
+      Crosstest.configuration.log_level = options.log_level || :info
+      @logger = Crosstest.default_file_logger
       project_set_file = options.file || DEFAULT_PROJECT_SET_FILE
       skeptic_file = options.skeptic || DEFAULT_TEST_MANIFEST_FILE
       @basedir = File.dirname project_set_file
       Crosstest.configuration.project_set = project_set_file
-      Crosstest.configuration.manifest = skeptic_file
+      Crosstest.configuration.skeptic.manifest_file = skeptic_file
       @test_dir = options.test_dir || File.expand_path('tests/crosstest/', @basedir)
-      @logger = Crosstest.default_file_logger
     end
 
     def setup
-      manifest.build_scenarios(configuration.project_set.projects)
+      # This autoload should probably be in Skeptic's initializer...
       autoload_crosstest_files(@test_dir) unless @test_dir.nil? || !File.directory?(@test_dir)
+
+      @skeptics = {}
+      projects.each do | project |
+        @skeptics[project.name] = Skeptic.new(project)
+      end
       manifest
     end
 
@@ -87,29 +93,32 @@ module Crosstest
       end
     end
 
+    def scenarios
+      @skeptics.values.flat_map(&:scenarios)
+    end
+
     def select_scenarios(regexp)
       regexp ||= 'all'
-      scenarios = manifest.scenarios
       if regexp == 'all'
         return scenarios
       else
-        scenarios = scenarios.find { |c| c.full_name == regexp } ||
-                    scenarios.select { |c| c.full_name =~ /#{regexp}/i }
+        selected_scenarios = scenarios.find { |c| c.full_name == regexp } ||
+                             scenarios.select { |c| c.full_name =~ /#{regexp}/i }
       end
 
-      if scenarios.is_a? Array
-        scenarios
+      if selected_scenarios.is_a? Array
+        selected_scenarios
       else
-        [scenarios]
+        [selected_scenarios]
       end
     end
 
     def filter_scenarios(project_regexp, scenario_regexp, options = {})
-      selected_scenarios = select_scenarios(scenario_regexp).tap do |scenarios|
-        scenarios.keep_if { |scenario| scenario.failed? == options[:failed] } unless options[:failed].nil?
-        scenarios.keep_if { |scenario| scenario.skipped? == options[:skipped] } unless options[:skipped].nil?
-        scenarios.keep_if { |scenario| scenario.sample? == options[:samples] } unless options[:samples].nil?
-      end
+      selected_scenarios = select_scenarios(scenario_regexp) # .tap do |scenarios|
+      selected_scenarios.keep_if { |scenario| scenario.failed? == options[:failed] } unless options[:failed].nil?
+      selected_scenarios.keep_if { |scenario| scenario.skipped? == options[:skipped] } unless options[:skipped].nil?
+      selected_scenarios.keep_if { |scenario| scenario.sample? == options[:samples] } unless options[:samples].nil?
+
       if project_regexp != 'all'
         selected_projects = filter_projects(project_regexp, options)
         project_names = selected_projects.map(&:name)
@@ -141,17 +150,12 @@ module Crosstest
     # @return [Logger] a logger
     def default_file_logger
       logfile = File.expand_path(File.join('.crosstest', 'logs', 'crosstest.log'))
-      ProjectLogger.new(stdout: $stdout, logdev: logfile, level: env_log)
-    end
-
-    def reset
-      @configuration = nil
-      Crosstest::Skeptic::ValidatorRegistry.clear
+      ProjectLogger.new(stdout: $stdout, logdev: logfile, level: Core::Util.to_logger_level(configuration.log_level))
     end
 
     # The {Crosstest::TestManifest} that describes the test scenarios known to Crosstest.
     def manifest
-      configuration.manifest
+      configuration.skeptic.manifest
     end
 
     # The set of {Crosstest::Project}s registered with Crosstest.
@@ -170,8 +174,8 @@ module Crosstest
     end
 
     # @api private
-    def global_runner
-      @global_runner ||= Crosstest::Psychic.new(cwd: Crosstest.basedir, logger: logger)
+    def psychic
+      @psychic ||= Crosstest::Psychic.new(cwd: Crosstest.basedir, logger: logger)
     end
 
     # Returns whether or not standard output is associated with a terminal
