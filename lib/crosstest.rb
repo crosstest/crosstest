@@ -77,7 +77,6 @@ module Crosstest
       projects.each do | project |
         @skeptics[project.name] = Skeptic.new(project)
       end
-      manifest
     end
 
     def scenario(pattern)
