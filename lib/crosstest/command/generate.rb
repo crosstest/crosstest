@@ -13,13 +13,14 @@ module Crosstest
       tasks['code2doc'].options = Code2Doc.class_options
 
       autoload :Documentation, 'crosstest/command/generators/documentation'
-      register Documentation, 'docs', 'docs', 'Generate documentation from a template'
-      tasks['docs'].options = Documentation.class_options
-      tasks['docs'].long_description = <<-eos
-      Generates documentation from a template. The templates may use Thor actions and Padrino helpers
+      register Documentation, 'generate', 'generate', 'Generates documentation, reports or other files from templates'
+      tasks['generate'].options = Documentation.class_options
+      tasks['generate'].long_description = <<-eos
+      Generates documentation, reports or other files from templates. The templates may use Thor actions and Padrino helpers
       in order to inject data from Crosstest test runs, code samples, or other sources.
 
-      Available templates: #{Documentation.generator_names.join(', ')}
+      Available templates: #{Command::Generate::Documentation.generator_names.join(', ')}
+      You may also run it against a directory containing a template with the --source option.
       eos
 
       # FIXME: Help shows unwanted usage, e.g. "crosstest crosstest:command:report:code2_doc"

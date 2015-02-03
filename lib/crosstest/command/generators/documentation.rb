@@ -11,6 +11,8 @@ module Crosstest
 
         BUILTIN_GENERATORS = Dir["#{Crosstest::Reporters::GENERATORS_DIR}/*"].select { |f| File.directory? f }
 
+        attr_reader :project, :project_name, :project_basedir
+
         class << self
           def generators
             BUILTIN_GENERATORS + Dir['tests/crosstest/generators/*'].select { |f| File.directory? f }
@@ -30,10 +32,13 @@ module Crosstest
           end
         end
 
-        argument :regexp, default: 'all'
+        argument :project_regexp, default: 'all'
+        argument :scenario_regexp, default: 'all'
         class_option :source, default: 'doc-src/', desc: 'Source folder with documentation templates'
         class_option :destination, default: 'docs/', desc: 'Destination for generated documentation'
         class_option :template, desc: 'The name or location of a custom generator template'
+        class_option :scope, desc: 'Whether the template should be applied once (global), per project, or per scenario',
+                             enum: %w(global project scenario), default: 'global'
         class_option :failed, type: :boolean, desc: 'Only list tests that failed / passed'
         class_option :skipped, type: :boolean, desc: 'Only list tests that were skipped / executed'
         class_option :samples, type: :boolean, desc: 'Only list tests that have sample code / do not have sample code'
@@ -64,8 +69,40 @@ module Crosstest
             generator_script = "#{options[:template]}_template.rb"
             apply(generator_script)
           else
-            directory Pathname(options[:source]).expand_path, Pathname(options[:destination]).expand_path
+            case options[:scope]
+            when 'global'
+              process_directory
+            when 'project'
+              Crosstest.filter_projects(project_regexp).each do | project |
+                set_project_variables(project)
+                process_directory
+              end
+            when 'scenario'
+              Crosstest.filter_scenarios(project_regexp, scenario_regexp).each do | scenario |
+                set_scenario_variables(scenario)
+                process_directory
+              end
+            end
           end
+        end
+
+        private
+
+        def process_directory
+          directory Pathname(options[:source]).expand_path, Pathname(options[:destination]).expand_path
+        end
+
+        def set_project_variables(project)
+          @project = project
+          @project_name = project.name
+          @project_basedir = project.basedir
+        end
+
+        def set_scenario_variables(scenario)
+          set_project_variables(scenario.project)
+          @scenario = scenario
+          @scenario_name = scenario.name
+          @scenario_slug = scenario.slug
         end
       end
     end

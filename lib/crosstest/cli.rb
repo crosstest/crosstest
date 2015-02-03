@@ -175,13 +175,14 @@ module Crosstest
                'Generates documenation from sample code for one or more scenarios'
       tasks['code2doc'].options = Command::Generate::Code2Doc.class_options
 
-      register Command::Generate::Documentation, 'docs', 'docs', 'Generate documentation from a template'
-      tasks['docs'].options = Command::Generate::Documentation.class_options
-      tasks['docs'].long_description = <<-eos
-      Generates documentation from a template. The templates may use Thor actions and Padrino helpers
+      register Command::Generate::Documentation, 'generate', 'generate', 'Generates documentation, reports or other files from templates'
+      tasks['generate'].options = Command::Generate::Documentation.class_options
+      tasks['generate'].long_description = <<-eos
+      Generates documentation, reports or other files from templates. The templates may use Thor actions and Padrino helpers
       in order to inject data from Crosstest test runs, code samples, or other sources.
 
       Available templates: #{Command::Generate::Documentation.generator_names.join(', ')}
+      You may also run it against a directory containing a template with the --source option.
       eos
     end
 
