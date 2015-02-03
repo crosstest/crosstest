@@ -7,12 +7,8 @@ module Crosstest
       include Crosstest::Core::Util::String
       include Crosstest::Core::FileSystem
 
-      def initialize(cmd_args, cmd_options, options = {})
-        @indent_level = 0
-        super
-      end
-
       def call
+        @indent_level = 0
         setup
         @reporter = Crosstest::Reporters.reporter(options[:format], shell)
         scenarios = parse_subcommand(args.shift, args.shift)

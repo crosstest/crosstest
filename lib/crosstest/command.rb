@@ -20,10 +20,10 @@ module Crosstest
       # @option options [Config] :test_dir a Config object (default: `nil`)
       # @option options [Loader] :loader a Loader object (default: `nil`)
       # @option options [String] :shell a Thor shell object
-      def initialize(cmd_args, cmd_options, options = {})
+      def initialize(action, cmd_args, cmd_options, options = {})
+        @action = action
         @args = cmd_args
         @options = cmd_options
-        @action = options.fetch(:action, nil)
         @help = options.fetch(:help, -> { 'No help provided' })
         @project_set_file = options.fetch('file', nil)
         @skeptic_file = options.fetch('skeptic', nil)
@@ -122,7 +122,7 @@ module Crosstest
       # which may or may not be running concurrently.
       #
       # @param collection [Array] an array of objections on which to perform the action
-      def run_action(collection, *args)
+      def run_action(collection, action, *args)
         @args.concat args
         concurrency = 1
         if options[:concurrency]

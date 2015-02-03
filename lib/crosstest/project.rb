@@ -27,6 +27,10 @@ module Crosstest
       @psychic ||= Crosstest::Psychic.new(name: name, cwd: basedir, logger: logger)
     end
 
+    def execute(*args)
+      psychic.execute(*args)
+    end
+
     def basedir
       self[:basedir] ||= "projects/#{name}"
     end

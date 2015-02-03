@@ -17,6 +17,8 @@ module Crosstest
     class BaseCLI < Crosstest::Core::CLI
       # Common module to load and invoke a CLI-implementation agnostic command.
       module PerformCommand
+        attr_reader :action
+
         # Perform a scenario subcommand.
         #
         # @param task [String] action to take, usually corresponding to the
@@ -30,7 +32,6 @@ module Crosstest
           require "crosstest/command/#{command}"
 
           command_options = {
-            action: task,
             help: -> { help(task) },
             test_dir: @test_dir,
             shell: shell
@@ -38,7 +39,7 @@ module Crosstest
 
           str_const = Thor::Util.camel_case(command)
           klass = ::Crosstest::Command.const_get(str_const)
-          klass.new(args, options, command_options).call
+          klass.new(task, args, options, command_options).call
         end
       end
 
@@ -116,6 +117,10 @@ module Crosstest
                     aliases: '-s',
                     desc: 'The Skeptic test manifest file',
                     default: 'skeptic.yaml'
+      method_option :exec,
+                    aliases: '-e',
+                    type: :boolean,
+                    desc: 'An arbitrary command to execute instead of a task'
       def task(*args)
         update_config!
         action_options = options.dup

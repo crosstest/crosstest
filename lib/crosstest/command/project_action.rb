@@ -12,7 +12,7 @@ module Crosstest
           setup
           project_regex = args.shift
           projects = select_projects(project_regex, options)
-          run_action(projects, *args)
+          run_action(projects, action, *args)
         end
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end
