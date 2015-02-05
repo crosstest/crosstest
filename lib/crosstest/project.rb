@@ -21,10 +21,14 @@ module Crosstest
 
     alias_method :cwd, :basedir
 
-    attr_accessor :psychic
+    attr_accessor :psychic, :skeptic
 
     def psychic
       @psychic ||= Crosstest::Psychic.new(name: name, cwd: basedir, logger: logger)
+    end
+
+    def skeptic
+      @skeptic ||= Crosstest::Skeptic.new(psychic)
     end
 
     def execute(*args)

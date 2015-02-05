@@ -78,7 +78,7 @@ module Crosstest
                 process_directory
               end
             when 'scenario'
-              Crosstest.filter_scenarios(project_regexp, scenario_regexp).each do | scenario |
+              Crosstest.scenarios(project_regexp, scenario_regexp).each do | scenario |
                 bind_scenario_variables(scenario)
                 process_directory
               end

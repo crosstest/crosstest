@@ -15,37 +15,6 @@ module Crosstest
 
   module CLI
     class BaseCLI < Crosstest::Core::CLI
-      # Common module to load and invoke a CLI-implementation agnostic command.
-      module PerformCommand
-        attr_reader :action
-
-        # Perform a scenario subcommand.
-        #
-        # @param task [String] action to take, usually corresponding to the
-        #   subcommand name
-        # @param command [String] command class to create and invoke]
-        # @param args [Array] remainder arguments from processed ARGV
-        #   (default: `nil`)
-        # @param additional_options [Hash] additional configuration needed to
-        #   set up the command class (default: `{}`)
-        def perform(task, command, args = nil, additional_options = {})
-          require "crosstest/command/#{command}"
-
-          command_options = {
-            help: -> { help(task) },
-            test_dir: @test_dir,
-            shell: shell
-          }.merge(additional_options)
-
-          str_const = Thor::Util.camel_case(command)
-          klass = ::Crosstest::Command.const_get(str_const)
-          klass.new(task, args, options, command_options).call
-        end
-      end
-
-      include Core::Logging
-      include PerformCommand
-
       # The maximum number of concurrent instances that can run--which is a bit
       # high
       MAX_CONCURRENCY = 9999

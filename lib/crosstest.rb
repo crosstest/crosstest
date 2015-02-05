@@ -22,9 +22,6 @@ module Crosstest
     DEFAULT_PROJECT_SET_FILE = 'crosstest.yaml'
     DEFAULT_TEST_MANIFEST_FILE = 'skeptic.yaml'
 
-    # @return [Mutex] a common mutex for global coordination
-    attr_accessor :mutex
-
     # @return [Logger] the common Crosstest logger
     attr_accessor :logger
 
@@ -72,60 +69,13 @@ module Crosstest
     def setup
       # This autoload should probably be in Skeptic's initializer...
       autoload_crosstest_files(@test_dir) unless @test_dir.nil? || !File.directory?(@test_dir)
-
-      @skeptics = {}
-      projects.each do | project |
-        @skeptics[project.name] = Skeptic.new(project)
-      end
     end
 
-    def scenario(pattern)
-      s = select_scenarios(pattern)
-      case s.size
-      when 1
-        return s.first
-      when 0
-        fail "No scenarios match #{pattern}"
-      else
-        matches = s.map(&:name).join(', ')
-        fail "Multiple scenarios matched #{pattern}: #{matches}"
+    def scenarios(project_regexp = 'all', scenario_regexp = 'all', options = {})
+      filtered_projects = filter_projects(project_regexp, options)
+      filtered_projects.map(&:skeptic).flat_map do | skeptic |
+        skeptic.scenarios scenario_regexp, options
       end
-    end
-
-    def scenarios
-      @skeptics.values.flat_map(&:scenarios)
-    end
-
-    def select_scenarios(regexp)
-      regexp ||= 'all'
-      if regexp == 'all'
-        return scenarios
-      else
-        selected_scenarios = scenarios.find { |c| c.full_name == regexp } ||
-                             scenarios.select { |c| c.full_name =~ /#{regexp}/i }
-      end
-
-      if selected_scenarios.is_a? Array
-        selected_scenarios
-      else
-        [selected_scenarios]
-      end
-    end
-
-    def filter_scenarios(project_regexp, scenario_regexp, options = {})
-      selected_scenarios = select_scenarios(scenario_regexp) # .tap do |scenarios|
-      selected_scenarios.keep_if { |scenario| scenario.failed? == options[:failed] } unless options[:failed].nil?
-      selected_scenarios.keep_if { |scenario| scenario.skipped? == options[:skipped] } unless options[:skipped].nil?
-      selected_scenarios.keep_if { |scenario| scenario.sample? == options[:samples] } unless options[:samples].nil?
-
-      if project_regexp != 'all'
-        selected_projects = filter_projects(project_regexp, options)
-        project_names = selected_projects.map(&:name)
-        selected_scenarios.keep_if do |s|
-          project_names.include? s.psychic.name
-        end
-      end
-      selected_scenarios
     end
 
     def filter_projects(regexp, _options = {})
@@ -197,5 +147,3 @@ module Crosstest
     end
   end
 end
-
-Crosstest.mutex = Mutex.new

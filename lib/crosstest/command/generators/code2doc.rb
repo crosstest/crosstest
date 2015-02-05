@@ -39,7 +39,7 @@ module Crosstest
         def setup
           Crosstest.update_config!(options)
           Crosstest.setup
-          @scenarios = Crosstest.filter_scenarios(project_regexp, scenario_regexp, options)
+          @scenarios = Crosstest.scenarios(project_regexp, scenario_regexp, options)
           abort "No scenarios for regex `#{scenario_regexp}', try running `crosstest list'" if @scenarios.empty?
         end
 
