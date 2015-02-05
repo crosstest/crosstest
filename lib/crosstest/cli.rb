@@ -260,8 +260,8 @@ module Crosstest
                       'Execute the code sample and capture the results.',
         verify: 'Change instance state to verified. ' \
                       'Assert that the captured results match the expectations for the scenario.',
-        destroy: 'Change scenario state to destroyed. ' \
-                     'Delete all information for one or more scenarios'
+        clear: 'Clear stored results for the scenario. ' \
+                     'Delete all stored results for one or more scenarios'
       }.each do |action, short_desc|
         desc(
           "#{action} [PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]",

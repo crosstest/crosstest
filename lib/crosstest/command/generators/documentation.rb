@@ -74,12 +74,12 @@ module Crosstest
               process_directory
             when 'project'
               Crosstest.filter_projects(project_regexp).each do | project |
-                set_project_variables(project)
+                bind_project_variables(project)
                 process_directory
               end
             when 'scenario'
               Crosstest.filter_scenarios(project_regexp, scenario_regexp).each do | scenario |
-                set_scenario_variables(scenario)
+                bind_scenario_variables(scenario)
                 process_directory
               end
             end
@@ -92,14 +92,14 @@ module Crosstest
           directory Pathname(options[:source]).expand_path, Pathname(options[:destination]).expand_path
         end
 
-        def set_project_variables(project)
+        def bind_project_variables(project)
           @project = project
           @project_name = project.name
           @project_basedir = project.basedir
         end
 
-        def set_scenario_variables(scenario)
-          set_project_variables(scenario.project)
+        def bind_scenario_variables(scenario)
+          bind_project_variables(scenario.project)
           @scenario = scenario
           @scenario_name = scenario.name
           @scenario_slug = scenario.slug
