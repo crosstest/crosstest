@@ -3,6 +3,8 @@ require 'thor'
 require 'crosstest'
 require 'crosstest/command'
 require 'crosstest/command/generate'
+require 'crosstest/psychic/cli'
+require 'crosstest/skeptic/cli'
 
 module Crosstest
   module Command
@@ -26,6 +28,21 @@ module Crosstest
       end
 
       protected
+
+      # Convert a Thor Option object to a hash so we can copy options from
+      # other commands.
+      #
+      # @param [Thor::Option] an option object
+      # @return [Hash] the options as a hash
+      # @api private
+      def self.option_to_hash(option)
+        [
+          :banner, :default, :description, :enum, :name,
+          :required, :type, :aliases, :group, :hide, :lazy_default
+        ].each_with_object({}) do | option_type, options_hash |
+          options_hash[option_type] = option.send(option_type)
+        end
+      end
 
       # Ensure the any failing commands exit non-zero.
       #
@@ -63,71 +80,39 @@ module Crosstest
     end
 
     class CrosstaskCLI < BaseCLI
-      desc 'task <task_name> [PROJECT|REGEXP|all]',
-           'Run a task in one or more projects'
-      long_desc <<-DESC
-        Runs the task in all projects or the projects specified.
-      DESC
+      desc 'clone [PROJECT|REGEXP|all]', 'Fetches the projects from version control'
       method_option :concurrency,
                     aliases: '-c',
                     type: :numeric,
                     lazy_default: MAX_CONCURRENCY,
                     desc: <<-DESC.gsub(/^\s+/, '').gsub(/\n/, ' ')
-          Run the task concurrently. If a value is given, it will be used as the max number of threads.
+          Run the task against all matching instances concurrently. Only N
+          instances will run at the same time if a number is given.
         DESC
       method_option :log_level,
                     aliases: '-l',
                     desc: 'Set the log level (debug, info, warn, error, fatal)'
       method_option :file,
-                    aliases: '-f',
-                    desc: 'The Crosstest project set file',
-                    default: 'crosstest.yaml'
-      method_option :skeptic,
-                    aliases: '-s',
-                    desc: 'The Skeptic test manifest file',
-                    default: 'skeptic.yaml'
-      method_option :exec,
-                    aliases: '-e',
-                    type: :boolean,
-                    desc: 'An arbitrary command to execute instead of a task'
-      def task(*args)
+                      aliases: '-f',
+                      desc: 'The Crosstest project set file',
+                      default: 'crosstest.yaml'
+      def clone(*args)
         update_config!
         action_options = options.dup
-        perform('task', 'task', args, action_options)
+        perform('clone', 'project_action', args, action_options)
       end
 
-      {
-        clone: 'Change scenario state to cloned. ' \
-                      'Clone the code sample from git',
-        bootstrap: 'Change scenario state to bootstraped. ' \
-                      'Running bootstrap scripts for the project'
-      }.each do |action, short_desc|
-        desc(
-          "#{action} [PROJECT|REGEXP|all]",
-          short_desc
-        )
-        long_desc <<-DESC
-          Executes the task in one or more projects.
-        DESC
-        method_option :concurrency,
-                      aliases: '-c',
-                      type: :numeric,
-                      lazy_default: MAX_CONCURRENCY,
-                      desc: <<-DESC.gsub(/^\s+/, '').gsub(/\n/, ' ')
-            Run the task against all matching instances concurrently. Only N
-            instances will run at the same time if a number is given.
-          DESC
-        method_option :log_level,
-                      aliases: '-l',
-                      desc: 'Set the log level (debug, info, warn, error, fatal)'
+      Psychic::CLI.commands.each do | action, command |
+        enhanced_banner = "#{action} [PROJECT|REGEXP|all]"
+        desc enhanced_banner, command.description
+        long_desc command.long_description
         method_option :file,
                       aliases: '-f',
                       desc: 'The Crosstest project set file',
                       default: 'crosstest.yaml'
-        method_option :skeptic,
-                      aliases: '-s',
-                      desc: 'The Skeptic test manifest file',
-                      default: 'skeptic.yaml'
+        command.options.select do | name, option |
+          method_option name, option_to_hash(option)
+        end
         define_method(action) do |*args|
           update_config!
           action_options = options.dup
@@ -166,6 +151,24 @@ module Crosstest
         method_option :samples,
                       type: :boolean,
                       desc: 'Only list tests that have sample code / do not have sample code'
+      end
+
+      Skeptic::CLI.commands.each do | action, command |
+        enhanced_banner = "#{action} [PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]"
+        desc enhanced_banner, command.description
+        long_desc command.long_description
+        method_option :file,
+                      aliases: '-f',
+                      desc: 'The Crosstest project set file',
+                      default: 'crosstest.yaml'
+        command.options.select do | name, option |
+          method_option name, option_to_hash(option)
+        end
+        define_method action do |*args|
+          update_config!
+          action_options = options.dup
+          perform(action, 'scenario_action', args, action_options)
+        end
       end
 
       desc 'list [PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]', 'Lists one or more scenarios'
@@ -220,55 +223,6 @@ module Crosstest
       def show(*args)
         update_config!
         perform('show', 'show', args, options)
-      end
-
-      {
-        detect: 'Find sample code that matches a test scenario. ' \
-                      'Attempts to locate a code sample with a filename that the test scenario name.',
-        exec: 'Change instance state to executed. ' \
-                      'Execute the code sample and capture the results.',
-        verify: 'Change instance state to verified. ' \
-                      'Assert that the captured results match the expectations for the scenario.',
-        clear: 'Clear stored results for the scenario. ' \
-                     'Delete all stored results for one or more scenarios'
-      }.each do |action, short_desc|
-        desc(
-          "#{action} [PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]",
-          short_desc
-        )
-        long_desc <<-DESC
-          The scenario states are in order: cloned, bootstrapped, executed, verified.
-          Change one or more scenarios from the current state to the #{action} state. Actions for all
-          intermediate states will be executed.
-        DESC
-        method_option :concurrency,
-                      aliases: '-c',
-                      type: :numeric,
-                      lazy_default: MAX_CONCURRENCY,
-                      desc: <<-DESC.gsub(/^\s+/, '').gsub(/\n/, ' ')
-            Run a #{action} against all matching instances concurrently. Only N
-            instances will run at the same time if a number is given.
-          DESC
-        method_option :log_level,
-                      aliases: '-l',
-                      desc: 'Set the log level (debug, info, warn, error, fatal)'
-        method_option :file,
-                      aliases: '-f',
-                      desc: 'The Crosstest project set file',
-                      default: 'crosstest.yaml'
-        method_option :skeptic,
-                      aliases: '-s',
-                      desc: 'The Skeptic test manifest file',
-                      default: 'skeptic.yaml'
-        method_option :test_dir,
-                      aliases: '-t',
-                      desc: 'The Crosstest test directory',
-                      default: 'tests/crosstest'
-        define_method(action) do |*args|
-          update_config!
-          action_options = options.dup
-          perform(action, 'scenario_action', args, action_options)
-        end
       end
 
       desc 'test [PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]',
