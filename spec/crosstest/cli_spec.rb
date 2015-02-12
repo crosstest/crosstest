@@ -20,8 +20,8 @@ module Crosstest
           xit 'calls bootstrap on the project' do
             # expect(@project).to receive(:bootstrap)
             expect(kernel).to receive(:exit).with(0)
-            expect(subject.stderr.string).to eq('')
             subject.bootstrap('test')
+            expect(subject.stderr.string).to eq('')
           end
         end
 
@@ -29,7 +29,7 @@ module Crosstest
           it 'fails' do
             expect(kernel).to receive(:exit).with(1)
             subject.bootstrap('missing')
-            expect(subject.stdout.string).to include('No projects matching regex `missing\'')
+            expect(subject.stderr.string).to include('No projects matching regex `missing\'')
           end
         end
       end

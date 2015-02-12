@@ -7,11 +7,12 @@ module Crosstest
       class Documentation < Thor::Group
         include Thor::Actions
         include Crosstest::Core::FileSystem
-        include Crosstest::Code2Doc::Helpers::CodeHelper
+        include Crosstest::Psychic::Code2Doc::CodeHelper
+        include Crosstest::Psychic::Code2Doc::SnippetHelper
 
         BUILTIN_GENERATORS = Dir["#{Crosstest::Reporters::GENERATORS_DIR}/*"].select { |f| File.directory? f }
 
-        attr_reader :project, :project_name, :project_basedir
+        attr_reader :projects, :project, :project_name, :project_basedir
 
         class << self
           def generators
@@ -42,7 +43,7 @@ module Crosstest
         class_option :failed, type: :boolean, desc: 'Only list tests that failed / passed'
         class_option :skipped, type: :boolean, desc: 'Only list tests that were skipped / executed'
         class_option :samples, type: :boolean, desc: 'Only list tests that have sample code / do not have sample code'
-
+        class_option :travis, type: :boolean, desc: "Enable/disable delegation to travis-build, if it's available"
         def setup
           Crosstest.update_config!(options)
           Crosstest.setup
@@ -71,6 +72,7 @@ module Crosstest
           else
             case options[:scope]
             when 'global'
+              @projects = Crosstest.filter_projects(project_regexp)
               process_directory
             when 'project'
               Crosstest.filter_projects(project_regexp).each do | project |
@@ -87,6 +89,13 @@ module Crosstest
         end
 
         private
+
+        def scenario_output_snippet(project_regex, scenario_regex, opts = {})
+          scenario = Crosstest.scenarios(project_regex, scenario_regex).first
+          fail "Output is not available for #{scenario_name} because that scenario does not exist" unless scenario
+          fail "Output is not available for #{scenario_name} because it has not been executed" unless scenario.result
+          snippetize_output(scenario.result, opts)
+        end
 
         def process_directory
           directory Pathname(options[:source]).expand_path, Pathname(options[:destination]).expand_path

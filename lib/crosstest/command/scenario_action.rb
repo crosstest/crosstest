@@ -11,7 +11,7 @@ module Crosstest
         elapsed = Benchmark.measure do
           setup
           scenarios = parse_subcommand(args.shift, args.shift)
-          run_action(scenarios, action)
+          run_action(scenarios, action, options[:concurrency])
         end
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end

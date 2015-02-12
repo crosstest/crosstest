@@ -2,8 +2,9 @@ require 'crosstest/version'
 require 'crosstest/core'
 require 'crosstest/psychic'
 require 'crosstest/skeptic'
-require 'crosstest/code2doc'
+require 'crosstest/run_action'
 require 'crosstest/project'
+require 'crosstest/workflow'
 require 'crosstest/project_set'
 require 'crosstest/project_logger'
 require 'crosstest/configuration'
@@ -16,8 +17,54 @@ module Crosstest
   # File extensions that Crosstest can automatically detect/execute
   SUPPORTED_EXTENSIONS = %w(py rb js)
 
+  module Delegators
+    # @api private
+    # @!macro delegate_to_skeptic
+    #   @method $1()
+    def delegate_to_skeptic_class(meth)
+      define_method(meth) { |*args, &block| Skeptic.public_send(meth, *args, &block) }
+    end
+
+    # @api private
+    # @!macro delegate_to_psychic
+    #   @method $1()
+    def delegate_to_psychic_class(meth)
+      define_method(meth) { |*args, &block| Psychic.public_send(meth, *args, &block) }
+    end
+
+    # @api private
+    # @!macro delegate_to_psychic
+    #   @method $1()
+    def delegate_to_psychic_instance(meth)
+      define_method(meth) { |*args, &block| psychic.public_send(meth, *args, &block) }
+    end
+
+    # @api private
+    # @!macro delegate_to_projects
+    #   @method $1()
+    def delegate_to_projects(meth)
+      define_method(meth) do |*args, &block|
+        project_regex = args.shift
+        run_action(filter_projects(project_regex), meth, configuration.concurrency, *args, &block)
+      end
+    end
+
+    # @api private
+    # @!macro delegate_to_scenarios
+    #   @method $1()
+    def delegate_to_scenarios(meth)
+      define_method(meth) do |*args, &block|
+        project_regex = args.shift
+        scenario_regex = args.shift
+        scenarios(project_regex, scenario_regex).map { |s| s.public_send(meth, *args, &block) }
+      end
+    end
+  end
+
   class << self
     include Core::Configurable
+    include RunAction
+    extend Delegators
 
     DEFAULT_PROJECT_SET_FILE = 'crosstest.yaml'
     DEFAULT_TEST_MANIFEST_FILE = 'skeptic.yaml'
@@ -56,14 +103,39 @@ module Crosstest
 
     def update_config!(options)
       trap_interrupt
-      Crosstest.configuration.log_level = options.log_level || :info
       @logger = Crosstest.default_file_logger
       project_set_file = options.file || DEFAULT_PROJECT_SET_FILE
-      skeptic_file = options.skeptic || DEFAULT_TEST_MANIFEST_FILE
       @basedir = File.dirname project_set_file
-      Crosstest.configuration.project_set = project_set_file
-      Crosstest.configuration.skeptic.manifest_file = skeptic_file
+      skeptic_file = options.skeptic || DEFAULT_TEST_MANIFEST_FILE
+
+      Crosstest.configure do | config |
+        config.concurrency = options.concurrency
+        config.log_level = options.log_level || :info
+        config.project_set = project_set_file
+        config.skeptic.manifest_file = skeptic_file
+        config.travis = options.travis if options.respond_to? :travis
+      end
       @test_dir = options.test_dir || File.expand_path('tests/crosstest/', @basedir)
+    end
+
+    delegate_to_skeptic_class :validate
+
+    delegate_to_projects :task
+
+    delegate_to_projects :workflow
+
+    delegate_to_projects :clone
+
+    delegate_to_projects :bootstrap
+
+    delegate_to_scenarios :test
+
+    delegate_to_scenarios :clear
+
+    delegate_to_scenarios :code2doc
+
+    Skeptic::Scenario::FSM::TRANSITIONS.each do | transition |
+      delegate_to_scenarios transition
     end
 
     def setup
@@ -73,24 +145,24 @@ module Crosstest
 
     def scenarios(project_regexp = 'all', scenario_regexp = 'all', options = {})
       filtered_projects = filter_projects(project_regexp, options)
-      filtered_projects.map(&:skeptic).flat_map do | skeptic |
+      filtered_scenarios = filtered_projects.map(&:skeptic).flat_map do | skeptic |
         skeptic.scenarios scenario_regexp, options
       end
+
+      fail UserError, "No scenarios for regex `#{scenario_regexp}', try running `crosstest list'" if filtered_scenarios.empty?
+      filtered_scenarios
     end
 
-    def filter_projects(regexp, _options = {})
-      regexp ||= 'all'
-      projects = if regexp == 'all'
-                   Crosstest.projects
-                 else
-                   Crosstest.projects.find { |s| s.name == regexp } ||
-                   Crosstest.projects.select { |s| s.name =~ /#{regexp}/i }
-                 end
-      if projects.is_a? Array
-        projects
-      else
-        [projects]
-      end
+    def filter_projects(regexp = 'all', _options = {})
+      return Crosstest.projects if regexp.nil? || regexp == 'all'
+
+      filtered_projects = Crosstest.projects.find { |s| s.name == regexp }
+      return [filtered_projects] if filtered_projects
+
+      filtered_projects ||= Crosstest.projects.select { |s| s.name =~ /#{regexp}/i }
+      fail UserError, "No projects matching regex `#{regexp}', known projects: #{Crosstest.projects.map(&:name)}" if filtered_projects.empty?
+
+      filtered_projects
     end
 
     # Returns a default file logger which emits on standard output and to a
@@ -112,19 +184,9 @@ module Crosstest
       configuration.project_set.projects.values
     end
 
-    # Registers a {Crosstest::Skeptic::Validator} that will be used during test
-    # execution on matching {Crosstest::Skeptic::Scenario}s.
-    def validate(desc, scope = { suite: //, scenario: // }, &block)
-      fail ArgumentError 'You must pass block' unless block_given?
-      validator = Crosstest::Skeptic::Validator.new(desc, scope, &block)
-
-      Crosstest::Skeptic::ValidatorRegistry.register validator
-      validator
-    end
-
     # @api private
     def psychic
-      @psychic ||= Crosstest::Psychic.new(cwd: Crosstest.basedir, logger: logger)
+      @psychic ||= Crosstest::Psychic.new(cwd: Crosstest.basedir, logger: logger, travis: Crosstest.configuration.travis)
     end
 
     # Returns whether or not standard output is associated with a terminal

@@ -8,7 +8,7 @@ module Crosstest
       Padrino::Helpers::OutputHelpers,
       Padrino::Helpers::AssetTagHelpers,
       Padrino::Helpers::TagHelpers,
-      Crosstest::Code2Doc::Helpers::CodeHelper
+      Crosstest::Psychic::Code2Doc::CodeHelper
     ].each do | helper|
       include helper
     end
@@ -45,7 +45,7 @@ module Crosstest
       segmenter_options = {
         language: language
       }
-      segmenter = Crosstest::Code2Doc::CodeSegmenter.new(segmenter_options)
+      segmenter = Crosstest::Psychic::Code2Doc::CodeSegmenter.new(segmenter_options)
       segments = segmenter.segment source_code
       segments.each do |comment, code|
         comment = comment.join("\n")
@@ -61,7 +61,7 @@ module Crosstest
     private
 
     def infer_language(source_file)
-      language, comment_style = Code2Doc::CommentStyles.infer File.extname(source_file)
+      language, comment_style = Psychic::Code2Doc::CommentStyles.infer File.extname(source_file)
       segmenter_language = comment_style[:language] || language
     end
   end

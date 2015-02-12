@@ -35,6 +35,7 @@ module Crosstest
     extend Core::Dash::Loadable
 
     required_field :projects, Hash[String => Crosstest::Project]
+    field :workflows, Hash[String => Crosstest::Workflow]
 
     def initialize(hash = {})
       super

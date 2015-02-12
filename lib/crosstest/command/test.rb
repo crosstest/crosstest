@@ -16,7 +16,7 @@ module Crosstest
           setup
           scenarios = parse_subcommand(args.shift, args.shift)
 
-          run_action(scenarios, :test)
+          run_action(scenarios, :test, options[:concurrency])
         end
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
         test_summary(scenarios)

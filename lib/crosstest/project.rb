@@ -24,7 +24,7 @@ module Crosstest
     attr_accessor :psychic, :skeptic
 
     def psychic
-      @psychic ||= Crosstest::Psychic.new(name: name, cwd: basedir, logger: logger)
+      @psychic ||= Crosstest::Psychic.new(name: name, cwd: basedir, logger: logger, travis: Crosstest.configuration.travis)
     end
 
     def skeptic
@@ -72,6 +72,21 @@ module Crosstest
       else
         logger.warn "Skipping #{task_name} for #{name}, no #{task_name} task exists"
       end
+    end
+
+    def workflow(workflow_name)
+      workflow_definition = Crosstest.configuration.project_set.workflows[workflow_name]
+      fail UserError, "Workflow '#{workflow_name}' is not defined" if workflow_definition.nil?
+
+      workflow = psychic.workflow(workflow_name) do
+        workflow_definition.tasks.each do | task_name |
+          task task_name
+        end
+      end
+
+      workflow.execute
+    rescue Psychic::TaskNotImplementedError => e
+      raise UserError, "Cannot run workflow '#{workflow_name}' for project '#{name}': #{e.message}"
     end
 
     def bootstrap

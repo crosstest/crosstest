@@ -10,15 +10,14 @@ module Crosstest
         banner "Starting Crosstest (v#{Crosstest::VERSION})"
         elapsed = Benchmark.measure do
           setup
-          if action == 'task'
-            action_to_invoke = args.shift
-          else
-            action_to_invoke = action
-          end # a bit hacky, can't we call the task method?
-
           project_regex = args.shift
+          if %w(task workflow).include? action # a bit hacky...
+            argument = project_regex
+            project_regex = args.shift
+            args.unshift argument
+          end
           projects = select_projects(project_regex, options)
-          run_action(projects, action_to_invoke, *args)
+          run_action(projects, action, options[:concurrency], *args)
         end
         banner "Crosstest is finished. #{Core::Util.duration(elapsed.real)}"
       end

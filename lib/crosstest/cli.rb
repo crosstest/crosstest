@@ -93,16 +93,40 @@ module Crosstest
                     aliases: '-l',
                     desc: 'Set the log level (debug, info, warn, error, fatal)'
       method_option :file,
-                      aliases: '-f',
-                      desc: 'The Crosstest project set file',
-                      default: 'crosstest.yaml'
+                    aliases: '-f',
+                    desc: 'The Crosstest project set file',
+                    default: 'crosstest.yaml'
       def clone(*args)
         update_config!
-        action_options = options.dup
-        perform('clone', 'project_action', args, action_options)
+        Crosstest.clone(*args)
+      end
+
+      desc 'workflow <name> [PROJECT|REGEXP|all]', 'Run the workflow against each project'
+      method_option :concurrency,
+                    aliases: '-c',
+                    type: :numeric,
+                    lazy_default: MAX_CONCURRENCY,
+                    desc: <<-DESC.gsub(/^\s+/, '').gsub(/\n/, ' ')
+          Run the task against all matching instances concurrently. Only N
+          instances will run at the same time if a number is given.
+        DESC
+      method_option :log_level,
+                    aliases: '-l',
+                    desc: 'Set the log level (debug, info, warn, error, fatal)'
+      method_option :file,
+                    aliases: '-f',
+                    desc: 'The Crosstest project set file',
+                    default: 'crosstest.yaml'
+      method_option :travis, type: :boolean, desc: "Enable/disable delegation to travis-build, if it's available"
+      def workflow(name, project_regex = 'all')
+        abort 'A workflow name is required' if args.empty?
+        update_config!
+        Crosstest.workflow(project_regex, name)
       end
 
       Psychic::CLI.commands.each do | action, command |
+        next if action == 'workflow' # We've customized it a bit
+
         enhanced_banner = "#{action} [PROJECT|REGEXP|all]"
         desc enhanced_banner, command.description
         long_desc command.long_description
@@ -115,8 +139,7 @@ module Crosstest
         end
         define_method(action) do |*args|
           update_config!
-          action_options = options.dup
-          perform(action, 'project_action', args, action_options)
+          Crosstest.public_send(action, *args)
         end
       end
     end
@@ -166,8 +189,7 @@ module Crosstest
         end
         define_method action do |*args|
           update_config!
-          action_options = options.dup
-          perform(action, 'scenario_action', args, action_options)
+          Crosstest.public_send(action, *args)
         end
       end
 

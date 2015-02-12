@@ -99,48 +99,5 @@ module Crosstest
           "Please try again or consult http://rubular.com/ (#{e.message})"
       end
     end
-
-    require 'celluloid'
-    # Common module to execute a Crosstest action such as create, converge, etc.
-    module RunAction
-      class Worker
-        include Celluloid
-
-        def work(item, action, test_env_number, *args)
-          item.vars['TEST_ENV_NUMBER'] = test_env_number if item.respond_to? :vars
-          item.public_send(action, *args)
-        rescue Crosstest::TransientFailure
-          # Celluloid supervisor should be restarting actors after errors, but
-          # it seems to die, so stop the error from propagating...
-          nil
-        end
-      end
-
-      # Run an action on each member of the collection. The collection could
-      # be Projects (e.g. clone, bootstrap) or Scenarios (e.g. test, clean).
-      # The instance actions will take place in a seperate thread of execution
-      # which may or may not be running concurrently.
-      #
-      # @param collection [Array] an array of objections on which to perform the action
-      def run_action(collection, action, *args)
-        @args.concat args
-        concurrency = 1
-        if options[:concurrency]
-          concurrency = options[:concurrency] || collection.size
-          concurrency = collection.size if concurrency > collection.size
-        end
-
-        if concurrency > 1
-          Celluloid::Actor[:crosstest_worker] = Worker.pool(size: concurrency)
-        else
-          Worker.supervise_as :crosstest_worker
-        end
-
-        futures = collection.each_with_index.map do |item, index|
-          actor = Celluloid::Actor[:crosstest_worker]
-          actor.work(item, action, index, *args)
-        end
-      end
-    end
   end
 end

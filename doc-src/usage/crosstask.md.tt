@@ -6,7 +6,7 @@ The first task you probably want to run is `bootstrap` in order to make sure the
 
 ```sh
 $ bundle exec crosstest bootstrap
-<%= Crosstest::Code2Doc.scenario_output_snippet 'bootstrap', include_command: false, format: :raw %>
+<%= scenario_output_snippet 'crosstest', 'bootstrap', include_command: false, format: :raw %>
 ```
 
 ### Custom tasks

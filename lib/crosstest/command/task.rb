@@ -14,9 +14,9 @@ module Crosstest
           project_regex = args.shift
           projects = Crosstest.filter_projects(project_regex)
           if options[:exec]
-            run_action(projects, :execute, task)
+            run_action(projects, :execute, options[:concurrency])
           else
-            run_action(projects, task)
+            run_action(projects, task, options[:concurrency])
           end
         end
         #  Need task summary...

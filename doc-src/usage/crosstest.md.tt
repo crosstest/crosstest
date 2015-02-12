@@ -8,16 +8,16 @@ Currently this is used for testing a code sample for each scenario. Crosstest wi
 
 Crosstest uses [Skeptic](https://github.com/crosstest/skeptic) to run tests, so the test scenarios are listed in a file called `skeptic.yaml`. The `suites` section of skeptic.yaml defines the tests you want to run. The suites contain scenarios ("samples"). Here is a simple file that defines a few scenarios:
 
-<%= Crosstest::Code2Doc.file_snippet 'samples/skeptic_simple.yaml' %>
+<%= file_snippet 'samples/skeptic_simple.yaml' %>
 
 You can also define properties for running samples with the "global_env" and "env" on suites. Here's a more complete example that shows defines some properties:
 
-<%= Crosstest::Code2Doc.file_snippet 'samples/skeptic.yaml' %>
+<%= file_snippet 'samples/skeptic.yaml' %>
 
 ### Available Commands
 
 You can always see the available commands by running:
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest help' %>
+<%= exec_snippet 'bundle exec crosstest help' %>
 
 You can see that most crosstest commands take two optional arguments: `[PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]`. The first selects which projects a command applies to and the second selects which scenarios. See the documentation on [Project Sets](project_sets) for more information about selecting projects with the first parameter. The second argument, for selecting scenarios, has similar behavior:
 - If omitted the command will apply to all scenarios.
@@ -30,16 +30,16 @@ You can see that most crosstest commands take two optional arguments: `[PROJECT|
 
 Crosstest keeps track of the test results so you don't need to test all projects or scenarios in a single run. You can use the command `crosstest list` to get quick summary of the latest results on the command line.
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest list', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest list', cwd: 'samples' %>
 
 
 The list command can also illustrate the behavior of the two parameters for narrowing the scope of any crosstest command. For example you could list the results for the ruby project:
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest list ruby', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest list ruby', cwd: 'samples' %>
 
 Or you could list only the quine results for ruby and java:
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest list "(ruby|java)" quine', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest list "(ruby|java)" quine', cwd: 'samples' %>
 
 ### Running Tests
 
@@ -47,11 +47,11 @@ The command `crosstest test` is for testing scenarios. If you run the command `c
 
 For example, you could just run test quine scenario for the python project:
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest test python quine', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest test python quine', cwd: 'samples' %>
 
 Or, you could run all of the ruby tests:
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest test ruby', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest test ruby', cwd: 'samples' %>
 
 ### Running individual phases
 
@@ -74,11 +74,11 @@ So if you only want to make sure that all of the samples execute, without valida
 
 The command `crosstest show` will display detailed results for the scenarios as text in your console.
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest show ruby hello', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest show ruby hello', cwd: 'samples' %>
 
 You can get even more information (including the actual code sample that was executed, with syntax highlighting if your console supports color) with the `--verbose` tag:
 
-<%= Crosstest::Code2Doc.exec_snippet 'bundle exec crosstest show ruby hello --verbose', cwd: 'samples' %>
+<%= exec_snippet 'bundle exec crosstest show ruby hello --verbose', cwd: 'samples' %>
 
 #### Generating HTML reports
 

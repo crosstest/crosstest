@@ -20,7 +20,7 @@ module Crosstest
             status('Test suite', scenario.suite)
             status('Test scenario', scenario.name)
             status('Project', scenario.psychic.name)
-            source_file = if scenario.absolute_source_file
+            source_file = if scenario.code_sample
                             Core::FileSystem.relativize(scenario.absolute_source_file, Dir.pwd)
                           else
                             colorize('<No code sample>', :red)

@@ -1,5 +1,6 @@
 require 'json'
 require 'crosstest/reporters'
+require 'crosstest/documentation_generator'
 
 module Crosstest
   module Command
@@ -9,6 +10,7 @@ module Crosstest
         include Crosstest::Core::Logging
         include Thor::Actions
         include Crosstest::Core::FileSystem
+        include Crosstest::Core::Util::String
 
         class_option :log_level,
                      aliases: '-l',
@@ -30,6 +32,7 @@ module Crosstest
                      aliases: '-d',
                      default: 'docs/',
                      desc: 'The target directory where documentation for generated documentation.'
+        class_option :source_files, type: :array
 
         class_option :destination, default: 'docs/'
 
@@ -47,20 +50,25 @@ module Crosstest
           self.destination_root = options[:destination]
         end
 
+        def source_files
+          @source_files = @scenarios.map do |scenario|
+            [scenario.slug, scenario.absolute_source_file]
+          end
+        end
+
         def code2doc
-          @scenarios.each do | scenario |
-            source_file = scenario.source_file
+          @source_files.each do |slug, source_file|
             if source_file.nil?
-              warn "No code sample available for #{scenario.slug}, no documentation will be generated."
+              warn "No code sample available for #{slug}, no documentation will be generated."
               next
             end
 
-            target_file_name = scenario.slug + ".#{options[:format]}"
+            target_file_name = slug + ".#{options[:format]}"
 
             begin
-              doc = Crosstest::DocumentationGenerator.new.code2doc(scenario.absolute_source_file)
+              doc = Crosstest::DocumentationGenerator.new.code2doc(source_file)
               create_file(target_file_name, doc)
-            rescue Crosstest::Code2Doc::CommentStyles::UnknownStyleError
+            rescue Crosstest::Psychic::Code2Doc::CommentStyles::UnknownStyleError
               warn "Could not generated documentation for #{source_file}, because the language couldn't be detected."
             end
           end

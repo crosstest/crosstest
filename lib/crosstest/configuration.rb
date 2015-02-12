@@ -10,6 +10,8 @@ module Crosstest
     field :dry_run, Object, default: false
     field :log_root, Pathname, default: '.crosstest/logs'
     field :log_level, Symbol, default: :info
+    field :travis, Object, default: false
+    field :concurrency, Integer
 
     # TODO: This should probably be configurable, or tied to Thor color options.
     if RSpec.respond_to?(:configuration)

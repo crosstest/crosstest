@@ -10,7 +10,7 @@ module Crosstest
       autoload :Code2Doc, 'crosstest/command/generators/code2doc'
       register Code2Doc, 'code2doc', 'code2doc [PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]',
                'Generates documenation from sample code for one or more scenarios'
-      tasks['code2doc'].options = Code2Doc.class_options
+      tasks['code2doc'].options = Command::Generate::Code2Doc.class_options
 
       autoload :Documentation, 'crosstest/command/generators/documentation'
       register Documentation, 'generate', 'generate', 'Generates documentation, reports or other files from templates'
