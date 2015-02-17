@@ -134,6 +134,7 @@ module Crosstest
                       aliases: '-f',
                       desc: 'The Crosstest project set file',
                       default: 'crosstest.yaml'
+        method_option :travis, type: :boolean, desc: "Enable/disable delegation to travis-build, if it's available"
         command.options.select do | name, option |
           method_option name, option_to_hash(option)
         end
@@ -213,6 +214,9 @@ module Crosstest
                     aliases: '-t',
                     desc: 'The Crosstest test directory',
                     default: 'tests/crosstest'
+      method_option :source,
+                    desc: 'Display the path to source code in the list?',
+                    type: :boolean
       filter_options
       def list(*args)
         update_config!

@@ -35,7 +35,7 @@ module Crosstest
         row << color_pad(scenario.psychic.name)
         row << format_status(scenario)
         if options[:source]
-          source_file = scenario.absolute_source_file ? relativize(scenario.absolute_source_file, Dir.pwd) : colorize('<No code sample>', :red)
+          source_file = scenario.absolute_source_file ? scenario.source_file : colorize('<No code sample>', :red)
           row << source_file
         end
         row
