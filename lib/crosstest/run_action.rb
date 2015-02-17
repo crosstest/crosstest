@@ -32,11 +32,13 @@ module Crosstest
         Worker.supervise_as :crosstest_worker
       end
 
-      futures = collection.each_with_index.map do |item, index|
+      # futures = collection.each_with_index.map do |item, index|
+      collection.each_with_index.map do |item, index|
         actor = Celluloid::Actor[:crosstest_worker]
-        actor.future.work(item, action, index, *args)
+        actor.work(item, action, index, *args)
+        # actor.future.work(item, action, index, *args)
       end
-      futures.map(&:value)
+      # futures.map(&:value)
     end
   end
 end
