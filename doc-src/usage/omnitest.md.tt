@@ -1,0 +1,87 @@
+## Omnitesting (via Skeptic)
+
+The `omnitest test` command will the same tests in each project, using spies to capture data and validate the behavior. This is for running tests that are shared across all projects to test for shared behavior. You can use `omnitask` to run each projects own test.
+
+Currently this is used for testing a code sample for each scenario. Omnitest will run the sample and capture the process's exit code, stdout and stderr. You can register additional "spies" with skeptic in order to capture additional information or perform additional validation. For example, there are spies that use the [Pacto](https://github.com/thoughtworks/pacto) project to capture HTTP requests and compare them with the RESTful services that were expected to be called for the scenario.
+
+### Defining test scenarios
+
+Omnitest uses [Skeptic](https://github.com/omnitest/skeptic) to run tests, so the test scenarios are listed in a file called `skeptic.yaml`. The `suites` section of skeptic.yaml defines the tests you want to run. The suites contain scenarios ("samples"). Here is a simple file that defines a few scenarios:
+
+<%= file_snippet 'samples/skeptic_simple.yaml' %>
+
+You can also define properties for running samples with the "global_env" and "env" on suites. Here's a more complete example that shows defines some properties:
+
+<%= file_snippet 'samples/skeptic.yaml' %>
+
+### Available Commands
+
+You can always see the available commands by running:
+<%= exec_snippet 'bundle exec omnitest help' %>
+
+You can see that most omnitest commands take two optional arguments: `[PROJECT|REGEXP|all] [SCENARIO|REGEXP|all]`. The first selects which projects a command applies to and the second selects which scenarios. See the documentation on [Project Sets](project_sets) for more information about selecting projects with the first parameter. The second argument, for selecting scenarios, has similar behavior:
+- If omitted the command will apply to all scenarios.
+- If a value is provided:
+  - If the value is "all" then the command applies to all scenarios. This only exists to make it possible to pass a third parameter, if necessary.
+  - If the value exactly matches the name of a scenario then only that scenario will be selected.
+  - If it does not match a scenario then it will be used as a regular expression to match other scenarios.
+
+### Listing Tests
+
+Omnitest keeps track of the test results so you don't need to test all projects or scenarios in a single run. You can use the command `omnitest list` to get quick summary of the latest results on the command line.
+
+<%= exec_snippet 'bundle exec omnitest list', cwd: 'samples' %>
+
+
+The list command can also illustrate the behavior of the two parameters for narrowing the scope of any omnitest command. For example you could list the results for the ruby project:
+
+<%= exec_snippet 'bundle exec omnitest list ruby', cwd: 'samples' %>
+
+Or you could list only the quine results for ruby and java:
+
+<%= exec_snippet 'bundle exec omnitest list "(ruby|java)" quine', cwd: 'samples' %>
+
+### Running Tests
+
+The command `omnitest test` is for testing scenarios. If you run the command `omnitest test` in each project it will test every scenario in all projects. You can narrow the scope of what you want to test by selecting projects with the first parameter and tests with the second parameter.
+
+For example, you could just run test quine scenario for the python project:
+
+<%= exec_snippet 'bundle exec omnitest test python quine', cwd: 'samples' %>
+
+Or, you could run all of the ruby tests:
+
+<%= exec_snippet 'bundle exec omnitest test ruby', cwd: 'samples' %>
+
+### Running individual phases
+
+The test command actually runs a series of phases. You can run these phases individually, which may be useful if you're still developing the samples or tests and just want to check that they work up to a certain point. If you run any of these phases they will run all of the previous phases but will stop at your target phase.
+
+There are two phases that apply at the project level:
+- clone: Make sure the project is available, if it is missing attempt to get it from version control.
+- bootstrap: Run the bootstrap task for the project to install dependenices.
+
+And three phases for each scenario:
+- detect: Find the code samples associated with the scenario.
+- exec: Run the code sample and capture the result.
+- verify: Validate the results captured by exec with any validators setup for that scenario.
+
+So if you only want to make sure that all of the samples execute, without validating the results to make sure they performed as expected, you could run `omnitest exec`.
+
+### Viewing Detailed Results
+
+#### On the Console
+
+The command `omnitest show` will display detailed results for the scenarios as text in your console.
+
+<%= exec_snippet 'bundle exec omnitest show ruby hello', cwd: 'samples' %>
+
+You can get even more information (including the actual code sample that was executed, with syntax highlighting if your console supports color) with the `--verbose` tag:
+
+<%= exec_snippet 'bundle exec omnitest show ruby hello --verbose', cwd: 'samples' %>
+
+#### Generating HTML reports
+
+You can also generate a variety of reports with the `omnidoc` command. The most useful is `omnidoc dashboard`, which will generate a dashboard showing a grid of test results that looks similar to the `omnidoc list` command, where each item is linked to additional details about the result that is similar to the `omnidoc show` command for that scenario.
+
+See the [omnidoc](omnidoc) documentation for more details.

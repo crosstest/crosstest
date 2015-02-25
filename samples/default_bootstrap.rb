@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-# This example shows the default behavior of `Crosstest#bootstrap`
-require 'crosstest'
+# This example shows the default behavior of `Omnitest#bootstrap`
+require 'omnitest'
 
 # Snippet: bootstrap
-Crosstest.bootstrap
+Omnitest.bootstrap

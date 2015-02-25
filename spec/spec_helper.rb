@@ -1,7 +1,7 @@
 require 'simplecov'
 SimpleCov.start
 
-require 'crosstest'
+require 'omnitest'
 require 'fabrication'
 require 'thor_spy'
 require 'aruba'
@@ -18,7 +18,7 @@ end
 
 RSpec.configure do |c|
   c.before(:each) do
-    Crosstest.reset
+    Omnitest.reset
   end
   c.expose_current_running_example_as :example
 end

@@ -1,7 +1,7 @@
 {
-  "name": "crosstest",
+  "name": "omnitest",
   "version": "0.1.4",
-  "homepage": "https://github.com/crosstest/crosstest",
+  "homepage": "https://github.com/omnitest/omnitest",
   "authors": [
     "Max Lincoln <max@devopsy.com>"
   ],

@@ -1,4 +1,4 @@
-require 'crosstest'
+require 'omnitest'
 require 'bundler/gem_tasks'
 require 'rake/notes/rake_task'
 require 'rspec/core/rake_task'
@@ -24,7 +24,7 @@ end
 
 desc 'Self-test and self-document'
 task :self do
-  sh 'bundle exec crosstest test'
+  sh 'bundle exec omnitest test'
 end
 
 RuboCop::RakeTask.new(:rubocop) do |task|

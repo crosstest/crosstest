@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-bundle exec crosstest clear
-bundle exec crosstest verify
+bundle exec omnitest clear
+bundle exec omnitest verify

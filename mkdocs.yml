@@ -1,8 +1,8 @@
-site_name: Crosstest
+site_name: Omnitest
 theme: readthedocs
 pages:
   - index.md
   - project_sets.md
-  - usage/crosstask.md
-  - usage/crosstest.md
+  - usage/omnitask.md
+  - usage/omnitest.md
 

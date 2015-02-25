@@ -1,4 +1,4 @@
-<%- Crosstest.projects.each do |project| -%>
+<%- Omnitest.projects.each do |project| -%>
 <%= project.name %>:
 <%- @challenges.select{|c| c.project == project}.each do |challenge| -%>
   - [<%= challenge.source? ? 'x' : ' ' %>] <%= challenge.name %>

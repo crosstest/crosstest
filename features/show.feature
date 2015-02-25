@@ -4,9 +4,9 @@ Feature: Show
     Given the ruby project
     And the java project
     And the python project
-    And the sample crosstest config
+    And the sample omnitest config
     And the hello_world skeptic config
-    When I run `bundle exec crosstest show ruby 'hello world'`
+    When I run `bundle exec omnitest show ruby 'hello world'`
     Then the output should contain:
     """
     katas-hello_world-ruby:                            <Not Found>
@@ -18,8 +18,8 @@ Feature: Show
 
   @no-clobber
   Scenario: State after testing
-    Given I run `bundle exec crosstest test ruby`
-    When I run `bundle exec crosstest show ruby 'hello world'`
+    Given I run `bundle exec omnitest test ruby`
+    When I run `bundle exec omnitest show ruby 'hello world'`
     Then the output should contain:
     """
     katas-hello_world-ruby:                            Fully Verified (1 of 1)

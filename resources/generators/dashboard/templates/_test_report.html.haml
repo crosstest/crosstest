@@ -22,10 +22,10 @@
           %li.list-group-item= status('Test suite:', @scenario.suite)
           %li.list-group-item= status('Test scenario:', @scenario.name)
           %li.list-group-item= status('Implementor:', @scenario.psychic.name)
-          %li.list-group-item= status('Duration:', Crosstest::Core::Util.duration(@scenario.duration))
+          %li.list-group-item= status('Duration:', Omnitest::Core::Util.duration(@scenario.duration))
           %li.list-group-item
             %strong.list-group-item-heading Test Input
-            - source_file = @scenario.absolute_source_file ? Crosstest::Core::FileSystem.relativize(@scenario.absolute_source_file, Dir.pwd) : '<No code sample>'
+            - source_file = @scenario.absolute_source_file ? Omnitest::Core::FileSystem.relativize(@scenario.absolute_source_file, Dir.pwd) : '<No code sample>'
             %ul.list-group-item
               %strong.list-group-item-heading Code sample
               %p.list-group-item-text

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-bundle exec crosstest detect
+bundle exec omnitest detect

@@ -1,0 +1,24 @@
+---
+  projects:
+    ruby:
+      language: 'ruby'
+      basedir: 'sdks/ruby'
+      git:
+        repo: 'https://github.com/omnitest/ruby_samples'
+    java:
+      language: 'java'
+      basedir: 'sdks/java'
+      git:
+        repo: 'https://github.com/omnitest/java_samples'
+    python:
+      language: 'python'
+      basedir: 'sdks/python'
+      git:
+        repo: 'https://github.com/omnitest/python_samples'
+  workflows:
+    morning:
+      tasks:
+        # - update_repo
+        - bootstrap
+        - lint
+        - test

@@ -1,6 +1,6 @@
-# Fabricates test manifests (.crosstest.yaml files)
+# Fabricates test manifests (.omnitest.yaml files)
 
-Fabricator(:manifest, from: Crosstest::Skeptic::TestManifest) do
+Fabricator(:manifest, from: Omnitest::Skeptic::TestManifest) do
   initialize_with { @_klass.new to_hash } # Hash based initialization
   transient suite_count: 3
   transient samples_per_suite: 3
@@ -24,7 +24,7 @@ Fabricator(:manifest, from: Crosstest::Skeptic::TestManifest) do
   end
 end
 
-Fabricator(:suite, from: Crosstest::Core::Mash) do
+Fabricator(:suite, from: Omnitest::Core::Mash) do
   initialize_with { @_klass.new to_hash } # Hash based initialization
   transient name: LANGUAGES[0]
   transient sample_count: 3

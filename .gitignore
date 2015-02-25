@@ -7,12 +7,12 @@ pacto.log
 **/tmp/
 node_modules/
 .tokens.json
-/crosstest/
+/omnitest/
 pkg/
 coverage/
 docs/
 site/
 .yardoc/
-.crosstest/
+.omnitest/
 bower_components/
 samples/sdks/

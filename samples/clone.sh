@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-bundle exec crosstest clone
+bundle exec omnitest clone

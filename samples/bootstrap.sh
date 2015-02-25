@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-bundle exec crosstest bootstrap "(java|ruby)"
+bundle exec omnitest bootstrap "(java|ruby)"

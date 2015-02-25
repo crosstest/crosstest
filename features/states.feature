@@ -4,9 +4,9 @@ Feature: States
     Given the ruby project
     And the java project
     And the python project
-    And the sample crosstest config
+    And the sample omnitest config
     And the hello_world skeptic config
-    When I run `bundle exec crosstest list`
+    When I run `bundle exec omnitest list`
     Then the output should contain:
     """
     Suite  Scenario     Project  Status
@@ -17,8 +17,8 @@ Feature: States
 
   @no-clobber
   Scenario: State after execution
-    Given I run `bundle exec crosstest exec python`
-    When I run `bundle exec crosstest list`
+    Given I run `bundle exec omnitest exec python`
+    When I run `bundle exec omnitest list`
     Then the output should contain:
     """
     Suite  Scenario     Project  Status
@@ -29,8 +29,8 @@ Feature: States
 
   @no-clobber
   Scenario: State after verification
-    Given I run `bundle exec crosstest verify ruby`
-    When I run `bundle exec crosstest list`
+    Given I run `bundle exec omnitest verify ruby`
+    When I run `bundle exec omnitest list`
     Then the output should contain:
     """
     Suite  Scenario     Project  Status

@@ -1,6 +1,6 @@
 require 'hashie'
 
-module Crosstest
+module Omnitest
   module Core
     class Dash < Hashie::Dash
       # @api private
@@ -8,7 +8,7 @@ module Crosstest
       #   @!attribute [rw] $1
       #     Attribute $1. $3
       #     @return [$2]
-      # Dummy method to load macro, see crosstest-core for the actual implementation
+      # Dummy method to load macro, see omnitest-core for the actual implementation
       def self.field(_name, _type, _opts = {})
       end
 
@@ -17,7 +17,7 @@ module Crosstest
       #   @!attribute [rw] $1
       #     **Required** Attribute $1. $3
       #     @return [$2]
-      # Dummy method to load macro, see crosstest-core for the actual implementation
+      # Dummy method to load macro, see omnitest-core for the actual implementation
       def self.required_field(_name, _type, _opts = {})
       end
     end

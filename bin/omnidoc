@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'omnitest/core'
+require 'omnitest/cli'
+
+Omnitest.with_friendly_errors { Omnitest::CLI::CrossdocCLI.start }

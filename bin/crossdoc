@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-require 'crosstest/core'
-require 'crosstest/cli'
-
-Crosstest.with_friendly_errors { Crosstest::CLI::CrossdocCLI.start }

@@ -5,8 +5,8 @@ Given(/^the (\w+) project$/) do |sdk|
   FileUtils.cp_r "samples/sdks/#{sdk}", "#{current_dir}/sdks"
 end
 
-Given(/^the (\w+) crosstest config$/) do |config|
-  FileUtils.cp_r "features/fixtures/configs/crosstest_#{config}.yaml", "#{current_dir}/crosstest.yaml"
+Given(/^the (\w+) omnitest config$/) do |config|
+  FileUtils.cp_r "features/fixtures/configs/omnitest_#{config}.yaml", "#{current_dir}/omnitest.yaml"
 end
 
 Given(/^the (\w+) skeptic config$/) do |config|

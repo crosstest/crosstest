@@ -1,8 +1,8 @@
 ## Project Sets
 
-You need to define a set of projects so crosstest can run tasks or tests across them. This is defined in the `crosstest.yaml` file (or a file passed with the `-f` or `--file` option to commands).
+You need to define a set of projects so omnitest can run tasks or tests across them. This is defined in the `omnitest.yaml` file (or a file passed with the `-f` or `--file` option to commands).
 
-The crosstest project set defines:
+The omnitest project set defines:
 - The names of the projects
 - The location where projects are stored locally
 - (Optionally) The version control information for the project
@@ -11,21 +11,21 @@ The crosstest project set defines:
 
 A simple project set without version control information looks like this:
 
-<%= file_snippet 'samples/crosstest_simple.yaml' %>
+<%= file_snippet 'samples/omnitest_simple.yaml' %>
 
-You can use this setup if you already have a copy of the projects or if some other tools is managing the version control. However if you include version control information in the project set than crosstest can automatically fetch, update and check the status of each project.
+You can use this setup if you already have a copy of the projects or if some other tools is managing the version control. However if you include version control information in the project set than omnitest can automatically fetch, update and check the status of each project.
 
 ## Getting the projects
 
-Crosstest needs to have a local copy of the project before it can run any tasks or tests. If you have included version control information in the crosstest file then you can use the `crosstest clone` command to fetch the projects.
+Omnitest needs to have a local copy of the project before it can run any tasks or tests. If you have included version control information in the omnitest file then you can use the `omnitest clone` command to fetch the projects.
 
 Here is an example project set that defines version control information for git repos:
 
-<%= file_snippet 'samples/crosstest.yaml' %>
+<%= file_snippet 'samples/omnitest.yaml' %>
 
-Now, you can use commands like `crosstest clone` to fetch the projects. See `crosstest help` for other available version control commands.
+Now, you can use commands like `omnitest clone` to fetch the projects. See `omnitest help` for other available version control commands.
 
 ```
-$ bundle exec crosstest clone
-<%= scenario_output_snippet 'crosstest', 'clone', include_command: false, format: :raw %>
+$ bundle exec omnitest clone
+<%= scenario_output_snippet 'omnitest', 'clone', include_command: false, format: :raw %>
 ```
