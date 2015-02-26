@@ -49,7 +49,7 @@
                   %strong.list-group-item-heading Validation Results
                   %ul.list-group
                     - @scenario.result.validations.each do |description, result|
-                      %li{:class => "list-group-item #{result.result}"}
+                      %li{:class => "list-group-item #{result.status}"}
                         %strong.list-group-item-heading= description
                         - if result.error
                           .list-group-item
